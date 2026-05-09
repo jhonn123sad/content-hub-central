@@ -82,7 +82,7 @@ export function useProjects() {
   return useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("projects")
         .select("*")
         .eq("active", true)
@@ -97,7 +97,7 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (project: Partial<Project>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("projects")
         .insert([project])
         .select()
@@ -115,7 +115,7 @@ export function useUpdateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Project> & { id: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("projects")
         .update(updates)
         .eq("id", id)
@@ -135,7 +135,7 @@ export function useContents() {
   return useQuery({
     queryKey: ["contents"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("contents")
         .select("*")
         .eq("active", true)
@@ -150,7 +150,7 @@ export function useCreateContent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (content: Partial<Content>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("contents")
         .insert([content])
         .select()
@@ -168,7 +168,7 @@ export function useUpdateContent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Content> & { id: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("contents")
         .update(updates)
         .eq("id", id)
@@ -188,7 +188,7 @@ export function useReferences() {
   return useQuery({
     queryKey: ["references"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("references")
         .select("*")
         .eq("active", true)
@@ -203,7 +203,7 @@ export function useCreateReference() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (reference: Partial<Reference>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("references")
         .insert([reference])
         .select()
@@ -222,7 +222,7 @@ export function useCreatives() {
   return useQuery({
     queryKey: ["creatives"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("creatives")
         .select("*")
         .eq("active", true)
@@ -237,7 +237,7 @@ export function useCreateCreative() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (creative: Partial<Creative>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("creatives")
         .insert([creative])
         .select()
@@ -256,7 +256,7 @@ export function useGoals() {
   return useQuery({
     queryKey: ["goals"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("goals")
         .select("*")
         .eq("active", true)
@@ -271,7 +271,7 @@ export function useCreateGoal() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (goal: Partial<Goal>) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("goals")
         .insert([goal])
         .select()
