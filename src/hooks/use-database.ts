@@ -82,7 +82,7 @@ export function useProjects() {
   return useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("mvp_list_projects");
+      const { data, error } = await (supabase as any).rpc("mvp_list_projects");
       if (error) throw error;
       
       return (data || []).map((p: any) => ({
@@ -100,7 +100,7 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (project: Partial<Project>) => {
-      const { data, error } = await supabase.rpc("mvp_create_project", {
+      const { data, error } = await (supabase as any).rpc("mvp_create_project", {
         p_title: project.title,
         p_description: project.description,
         p_status: project.status || 'active'
@@ -118,7 +118,7 @@ export function useUpdateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Project> & { id: string }) => {
-      const { data, error } = await supabase.rpc("mvp_update_project", {
+      const { data, error } = await (supabase as any).rpc("mvp_update_project", {
         p_id: id,
         p_title: updates.title,
         p_description: updates.description,
@@ -137,7 +137,7 @@ export function useArchiveProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.rpc("mvp_archive_project", {
+      const { data, error } = await (supabase as any).rpc("mvp_archive_project", {
         p_id: id
       });
       if (error) throw error;
