@@ -74,7 +74,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t p-2 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
-        Dados de exemplo · MVP
+        Conectado ao Supabase · MVP
       </SidebarFooter>
     </Sidebar>
   );
