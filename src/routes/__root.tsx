@@ -7,7 +7,6 @@ import {
   HeadContent,
   Scripts,
   useLocation,
-  useNavigate,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,8 +112,6 @@ function RootComponent() {
   const isAuthPage = location.pathname === "/auth";
 
   if (isAuthPage) {
-
-  if (isAuthPage) {
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
@@ -133,7 +130,7 @@ function RootComponent() {
               <SidebarTrigger />
               <div className="flex flex-1 items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Central de Conteúdo · MVP (Supabase Externo)
+                  Central de Conteúdo · MVP
                 </span>
                 {session && (
                   <button
