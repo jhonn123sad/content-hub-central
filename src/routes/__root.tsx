@@ -92,22 +92,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [session, setSession] = useState<any>(null);
   const location = useLocation();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const isAuthPage = location.pathname === "/auth";
 
@@ -132,14 +117,6 @@ function RootComponent() {
                 <span className="text-sm text-muted-foreground">
                   Central de Conteúdo · MVP
                 </span>
-                {session && (
-                  <button
-                    onClick={() => supabase.auth.signOut()}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Sair
-                  </button>
-                )}
               </div>
             </header>
             <main className="flex-1">
