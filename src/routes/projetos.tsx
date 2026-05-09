@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockProjects } from "@/lib/mock-data";
+import { useProjects, useCreateProject } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/projetos")({
   head: () => ({ meta: [{ title: "Projetos — Central de Conteúdo" }] }),
@@ -28,7 +28,45 @@ export const Route = createFileRoute("/projetos")({
 
 function ProjectsPage() {
   const [open, setOpen] = useState(false);
-  const projects = mockProjects;
+  const { data: projects = [], isLoading } = useProjects();
+  const createProject = useCreateProject();
+
+  // Form states
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    objective: "",
+    niche: "",
+    main_platform: "",
+    status: "active",
+    daily_content_goal: "0",
+    drive_url: "",
+    start_date: "",
+  });
+
+  const handleSubmit = async () => {
+    try {
+      await createProject.mutateAsync({
+        ...formData,
+        daily_content_goal: parseInt(formData.daily_content_goal) || 0,
+      });
+      toast.success("Projeto salvo com sucesso!");
+      setOpen(false);
+      setFormData({
+        title: "",
+        description: "",
+        objective: "",
+        niche: "",
+        main_platform: "",
+        status: "active",
+        daily_content_goal: "0",
+        drive_url: "",
+        start_date: "",
+      });
+    } catch (error) {
+      toast.error("Erro ao salvar projeto");
+    }
+  };
 
   return (
     <div>
@@ -42,7 +80,9 @@ function ProjectsPage() {
         }
       />
       <div className="p-6">
-        {projects.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center p-12">Carregando projetos...</div>
+        ) : projects.length === 0 ? (
           <EmptyState
             icon={<FolderKanban className="h-6 w-6" />}
             title="Nenhum projeto ainda"
@@ -60,17 +100,17 @@ function ProjectsPage() {
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="font-semibold">{p.name}</h3>
+                      <h3 className="font-semibold">{p.title}</h3>
                       <p className="text-xs text-muted-foreground">{p.niche}</p>
                     </div>
-                    <Badge variant="outline">{p.platform}</Badge>
+                    <Badge variant="outline">{p.main_platform}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {p.description}
                   </p>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Meta: {p.dailyGoal}/dia</span>
-                    <span>Desde {p.startDate}</span>
+                    <span>Meta: {p.daily_content_goal}/dia</span>
+                    <span>Desde {p.start_date || "—"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -84,26 +124,42 @@ function ProjectsPage() {
         onOpenChange={setOpen}
         title="Novo projeto"
         description="Defina os dados principais do projeto"
-        onSubmit={() => {
-          toast.success("Projeto salvo (mock)");
-          setOpen(false);
-        }}
+        onSubmit={handleSubmit}
       >
         <Field label="Nome">
-          <Input placeholder="Ex: Canal de tecnologia" />
+          <Input 
+            value={formData.title} 
+            onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            placeholder="Ex: Canal de tecnologia" 
+          />
         </Field>
         <Field label="Descrição">
-          <Textarea placeholder="Sobre o que é este projeto" />
+          <Textarea 
+            value={formData.description} 
+            onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Sobre o que é este projeto" 
+          />
         </Field>
         <Field label="Objetivo">
-          <Input placeholder="Ex: 10k inscritos em 6 meses" />
+          <Input 
+            value={formData.objective} 
+            onChange={e => setFormData(prev => ({ ...prev, objective: e.target.value }))}
+            placeholder="Ex: 10k inscritos em 6 meses" 
+          />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Nicho">
-            <Input placeholder="Tecnologia, finanças..." />
+            <Input 
+              value={formData.niche} 
+              onChange={e => setFormData(prev => ({ ...prev, niche: e.target.value }))}
+              placeholder="Tecnologia, finanças..." 
+            />
           </Field>
           <Field label="Plataforma principal">
-            <Select>
+            <Select 
+              value={formData.main_platform} 
+              onValueChange={v => setFormData(prev => ({ ...prev, main_platform: v }))}
+            >
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="youtube">YouTube</SelectItem>
@@ -117,7 +173,10 @@ function ProjectsPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Status">
-            <Select>
+            <Select 
+              value={formData.status} 
+              onValueChange={v => setFormData(prev => ({ ...prev, status: v }))}
+            >
               <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">Ativo</SelectItem>
@@ -127,14 +186,28 @@ function ProjectsPage() {
             </Select>
           </Field>
           <Field label="Meta diária de conteúdos">
-            <Input type="number" min={0} placeholder="0" />
+            <Input 
+              type="number" 
+              min={0} 
+              value={formData.daily_content_goal} 
+              onChange={e => setFormData(prev => ({ ...prev, daily_content_goal: e.target.value }))}
+              placeholder="0" 
+            />
           </Field>
         </div>
         <Field label="Link do Drive">
-          <Input placeholder="https://drive.google.com/..." />
+          <Input 
+            value={formData.drive_url} 
+            onChange={e => setFormData(prev => ({ ...prev, drive_url: e.target.value }))}
+            placeholder="https://drive.google.com/..." 
+          />
         </Field>
         <Field label="Data de início">
-          <Input type="date" />
+          <Input 
+            type="date" 
+            value={formData.start_date} 
+            onChange={e => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+          />
         </Field>
       </FormDialog>
     </div>

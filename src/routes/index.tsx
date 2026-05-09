@@ -11,12 +11,8 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { StatusBadge } from "@/components/status-badge";
-import {
-  mockContents,
-  mockProjects,
-  mockReferences,
-} from "@/lib/mock-data";
+import { StatusBadge, type ContentStatus } from "@/components/status-badge";
+import { useContents, useProjects, useReferences } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,22 +25,39 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
+  const { data: contents = [], isLoading: isLoadingContents } = useContents();
+  const { data: projects = [], isLoading: isLoadingProjects } = useProjects();
+  const { data: references = [], isLoading: isLoadingRefs } = useReferences();
+
   const today = new Date().toISOString().slice(0, 10);
-  const plannedToday = mockContents.filter((c) => c.plannedDate === today);
-  const ready = mockContents.filter((c) => c.status === "ready" || c.status === "scheduled");
-  const late = mockContents.filter(
-    (c) => c.plannedDate < today && !["published", "archived"].includes(c.status),
+  
+  const plannedToday = contents.filter((c) => c.planned_date === today);
+  const ready = contents.filter((c) => c.status === "ready" || c.status === "scheduled");
+  const late = contents.filter(
+    (c) => c.planned_date && c.planned_date < today && !["published", "archived"].includes(c.status),
   );
-  const activeProjects = mockProjects.filter((p) => p.status === "active");
-  const dailyTarget = activeProjects.reduce((acc, p) => acc + p.dailyGoal, 0) || 1;
-  const dailyDone = mockContents.filter(
-    (c) => c.publishedDate === today,
+  
+  const activeProjects = projects.filter((p) => p.status === "active");
+  const dailyTarget = activeProjects.reduce((acc, p) => acc + (p.daily_content_goal || 0), 0) || 1;
+  const dailyDone = contents.filter(
+    (c) => c.published_date === today,
   ).length;
   const dailyPct = Math.min(100, Math.round((dailyDone / dailyTarget) * 100));
-  const upcoming = [...mockContents]
-    .filter((c) => c.plannedDate >= today)
-    .sort((a, b) => a.plannedDate.localeCompare(b.plannedDate))
+  
+  const upcoming = [...contents]
+    .filter((c) => c.planned_date && c.planned_date >= today)
+    .sort((a, b) => (a.planned_date || "").localeCompare(b.planned_date || ""))
     .slice(0, 5);
+
+  const isLoading = isLoadingContents || isLoadingProjects || isLoadingRefs;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Carregando dashboard...
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -95,10 +108,10 @@ function Dashboard() {
                       <div>
                         <p className="text-sm font-medium">{c.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {c.plannedDate} · {c.platform}
+                          {c.planned_date} · {c.platform}
                         </p>
                       </div>
-                      <StatusBadge status={c.status} />
+                      <StatusBadge status={c.status as ContentStatus} />
                     </li>
                   ))}
                 </ul>
@@ -134,11 +147,11 @@ function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {mockReferences.length === 0 ? (
+            {references.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma referência ainda.</p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
-                {mockReferences.slice(0, 4).map((r) => (
+                {references.slice(0, 4).map((r) => (
                   <li
                     key={r.id}
                     className="rounded-lg border bg-card p-3 text-sm"

@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { mockReferences, mockProjects } from "@/lib/mock-data";
+import { useReferences, useProjects, useCreateReference } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/referencias")({
   head: () => ({ meta: [{ title: "Referências — Central de Conteúdo" }] }),
@@ -25,17 +25,53 @@ export const Route = createFileRoute("/referencias")({
 function ReferencesPage() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const [type, setType] = useState("all");
-  const [project, setProject] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [projectFilter, setProjectFilter] = useState("all");
+
+  const { data: references = [], isLoading: isLoadingRefs } = useReferences();
+  const { data: projects = [] } = useProjects();
+  const createReference = useCreateReference();
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    type: "video",
+    url: "",
+    image_url: "",
+    project_id: "",
+    notes: "",
+  });
 
   const filtered = useMemo(() => {
-    return mockReferences.filter((r) => {
+    return references.filter((r) => {
       if (q && !r.title.toLowerCase().includes(q.toLowerCase())) return false;
-      if (type !== "all" && r.type !== type) return false;
-      if (project !== "all" && r.projectId !== project) return false;
+      if (typeFilter !== "all" && r.type !== typeFilter) return false;
+      if (projectFilter !== "all" && r.project_id !== projectFilter) return false;
       return true;
     });
-  }, [q, type, project]);
+  }, [references, q, typeFilter, projectFilter]);
+
+  const handleSubmit = async () => {
+    try {
+      await createReference.mutateAsync({
+        ...formData,
+        project_id: formData.project_id || null,
+      });
+      toast.success("Referência salva!");
+      setOpen(false);
+      setFormData({
+        title: "",
+        description: "",
+        type: "video",
+        url: "",
+        image_url: "",
+        project_id: "",
+        notes: "",
+      });
+    } catch (error) {
+      toast.error("Erro ao salvar referência");
+    }
+  };
 
   return (
     <div>
@@ -59,7 +95,7 @@ function ReferencesPage() {
               className="w-[240px] pl-9"
             />
           </div>
-          <Select value={type} onValueChange={setType}>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
@@ -70,16 +106,18 @@ function ReferencesPage() {
               <SelectItem value="outro">Outro</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={project} onValueChange={setProject}>
+          <Select value={projectFilter} onValueChange={setProjectFilter}>
             <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os projetos</SelectItem>
-              {mockProjects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+              {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
-        {filtered.length === 0 ? (
+        {isLoadingRefs ? (
+          <div className="flex justify-center p-12">Carregando referências...</div>
+        ) : filtered.length === 0 ? (
           <EmptyState
             icon={<Bookmark className="h-6 w-6" />}
             title="Sem referências"
@@ -96,11 +134,8 @@ function ReferencesPage() {
                     <Badge variant="outline">{r.type}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{r.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {r.tags.map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
-                  </div>
-                  {r.link && (
-                    <a href={r.link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                  {r.url && (
+                    <a href={r.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
                       Abrir <ExternalLink className="h-3 w-3" />
                     </a>
                   )}
@@ -112,12 +147,12 @@ function ReferencesPage() {
       </div>
 
       <FormDialog open={open} onOpenChange={setOpen} title="Nova referência"
-        onSubmit={() => { toast.success("Referência salva (mock)"); setOpen(false); }}>
-        <Field label="Título"><Input /></Field>
-        <Field label="Descrição"><Textarea /></Field>
+        onSubmit={handleSubmit}>
+        <Field label="Título"><Input value={formData.title} onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))} /></Field>
+        <Field label="Descrição"><Textarea value={formData.description} onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))} /></Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Tipo">
-            <Select>
+            <Select value={formData.type} onValueChange={v => setFormData(prev => ({ ...prev, type: v }))}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="video">Vídeo</SelectItem>
@@ -128,22 +163,18 @@ function ReferencesPage() {
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Link"><Input placeholder="https://..." /></Field>
+          <Field label="Link"><Input value={formData.url} onChange={e => setFormData(prev => ({ ...prev, url: e.target.value }))} placeholder="https://..." /></Field>
         </div>
-        <Field label="Imagem principal (URL)"><Input placeholder="https://..." /></Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Projeto relacionado">
-            <Select>
-              <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
-              <SelectContent>
-                {mockProjects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Conteúdo relacionado"><Input placeholder="Título ou ID" /></Field>
-        </div>
-        <Field label="Tags (separadas por vírgula)"><Input placeholder="ex: edição, ritmo" /></Field>
-        <Field label="Observações"><Textarea /></Field>
+        <Field label="Imagem principal (URL)"><Input value={formData.image_url} onChange={e => setFormData(prev => ({ ...prev, image_url: e.target.value }))} placeholder="https://..." /></Field>
+        <Field label="Projeto relacionado">
+          <Select value={formData.project_id} onValueChange={v => setFormData(prev => ({ ...prev, project_id: v }))}>
+            <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+            <SelectContent>
+              {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="Observações"><Textarea value={formData.notes} onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))} /></Field>
       </FormDialog>
     </div>
   );

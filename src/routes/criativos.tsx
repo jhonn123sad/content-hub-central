@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockCreatives, mockProjects, mockContents } from "@/lib/mock-data";
+import { useCreatives, useProjects, useContents, useCreateCreative } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/criativos")({
   head: () => ({ meta: [{ title: "Criativos — Central de Conteúdo" }] }),
@@ -25,18 +25,60 @@ const statuses = ["draft", "review", "approved", "published"];
 
 function CreativesPage() {
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState("all");
-  const [status, setStatus] = useState("all");
-  const [project, setProject] = useState("all");
-  const [content, setContent] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [projectFilter, setProjectFilter] = useState("all");
+  const [contentFilter, setContentFilter] = useState("all");
 
-  const filtered = useMemo(() => mockCreatives.filter((c) => {
-    if (type !== "all" && c.type !== type) return false;
-    if (status !== "all" && c.status !== status) return false;
-    if (project !== "all" && c.projectId !== project) return false;
-    if (content !== "all" && c.contentId !== content) return false;
+  const { data: creatives = [], isLoading: isLoadingCreatives } = useCreatives();
+  const { data: projects = [] } = useProjects();
+  const { data: contents = [] } = useContents();
+  const createCreative = useCreateCreative();
+
+  const [formData, setFormData] = useState({
+    title: "",
+    type: "thumbnail",
+    status: "draft",
+    project_id: "",
+    content_id: "",
+    file_url: "",
+    image_url: "",
+    description: "",
+    notes: "",
+  });
+
+  const filtered = useMemo(() => creatives.filter((c) => {
+    if (typeFilter !== "all" && c.type !== typeFilter) return false;
+    if (statusFilter !== "all" && c.status !== statusFilter) return false;
+    if (projectFilter !== "all" && c.project_id !== projectFilter) return false;
+    if (contentFilter !== "all" && c.content_id !== contentFilter) return false;
     return true;
-  }), [type, status, project, content]);
+  }), [creatives, typeFilter, statusFilter, projectFilter, contentFilter]);
+
+  const handleSubmit = async () => {
+    try {
+      await createCreative.mutateAsync({
+        ...formData,
+        project_id: formData.project_id || null,
+        content_id: formData.content_id || null,
+      });
+      toast.success("Criativo salvo!");
+      setOpen(false);
+      setFormData({
+        title: "",
+        type: "thumbnail",
+        status: "draft",
+        project_id: "",
+        content_id: "",
+        file_url: "",
+        image_url: "",
+        description: "",
+        notes: "",
+      });
+    } catch (error) {
+      toast.error("Erro ao salvar criativo");
+    }
+  };
 
   return (
     <div>
@@ -47,13 +89,15 @@ function CreativesPage() {
       />
       <div className="space-y-6 p-6">
         <div className="flex flex-wrap gap-2">
-          <FilterSelect value={type} onChange={setType} options={[{ value: "all", label: "Todos os tipos" }, ...types.map((t) => ({ value: t, label: t }))]} />
-          <FilterSelect value={status} onChange={setStatus} options={[{ value: "all", label: "Todos status" }, ...statuses.map((s) => ({ value: s, label: s }))]} />
-          <FilterSelect value={project} onChange={setProject} options={[{ value: "all", label: "Todos projetos" }, ...mockProjects.map((p) => ({ value: p.id, label: p.name }))]} />
-          <FilterSelect value={content} onChange={setContent} options={[{ value: "all", label: "Todos conteúdos" }, ...mockContents.map((c) => ({ value: c.id, label: c.title }))]} />
+          <FilterSelect value={typeFilter} onChange={setTypeFilter} options={[{ value: "all", label: "Todos os tipos" }, ...types.map((t) => ({ value: t, label: t }))]} />
+          <FilterSelect value={statusFilter} onChange={setStatusFilter} options={[{ value: "all", label: "Todos status" }, ...statuses.map((s) => ({ value: s, label: s }))]} />
+          <FilterSelect value={projectFilter} onChange={setProjectFilter} options={[{ value: "all", label: "Todos projetos" }, ...projects.map((p) => ({ value: p.id, label: p.title }))]} />
+          <FilterSelect value={contentFilter} onChange={setContentFilter} options={[{ value: "all", label: "Todos conteúdos" }, ...contents.map((c) => ({ value: c.id, label: c.title }))]} />
         </div>
 
-        {filtered.length === 0 ? (
+        {isLoadingCreatives ? (
+          <div className="flex justify-center p-12">Carregando criativos...</div>
+        ) : filtered.length === 0 ? (
           <EmptyState
             icon={<ImageIcon className="h-6 w-6" />}
             title="Nenhum criativo"
@@ -71,9 +115,6 @@ function CreativesPage() {
                   </div>
                   <Badge variant="secondary">{c.status}</Badge>
                   <p className="text-sm text-muted-foreground">{c.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {c.tags.map((t) => <Badge key={t} variant="secondary">{t}</Badge>)}
-                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -82,17 +123,17 @@ function CreativesPage() {
       </div>
 
       <FormDialog open={open} onOpenChange={setOpen} title="Novo criativo"
-        onSubmit={() => { toast.success("Criativo salvo (mock)"); setOpen(false); }}>
-        <Field label="Título"><Input /></Field>
+        onSubmit={handleSubmit}>
+        <Field label="Título"><Input value={formData.title} onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))} /></Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Tipo">
-            <Select>
+            <Select value={formData.type} onValueChange={v => setFormData(prev => ({ ...prev, type: v }))}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>{types.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
           <Field label="Status">
-            <Select>
+            <Select value={formData.status} onValueChange={v => setFormData(prev => ({ ...prev, status: v }))}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>{statuses.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
@@ -100,22 +141,22 @@ function CreativesPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Projeto relacionado">
-            <Select>
+            <Select value={formData.project_id} onValueChange={v => setFormData(prev => ({ ...prev, project_id: v }))}>
               <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
-              <SelectContent>{mockProjects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+              <SelectContent>{projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
           <Field label="Conteúdo relacionado">
-            <Select>
+            <Select value={formData.content_id} onValueChange={v => setFormData(prev => ({ ...prev, content_id: v }))}>
               <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
-              <SelectContent>{mockContents.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}</SelectContent>
+              <SelectContent>{contents.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
         </div>
-        <Field label="Link do arquivo"><Input placeholder="https://drive..." /></Field>
-        <Field label="Imagem principal (URL)"><Input placeholder="https://..." /></Field>
-        <Field label="Descrição"><Textarea /></Field>
-        <Field label="Tags (separadas por vírgula)"><Input /></Field>
+        <Field label="Link do arquivo"><Input value={formData.file_url} onChange={e => setFormData(prev => ({ ...prev, file_url: e.target.value }))} placeholder="https://drive..." /></Field>
+        <Field label="Imagem principal (URL)"><Input value={formData.image_url} onChange={e => setFormData(prev => ({ ...prev, image_url: e.target.value }))} placeholder="https://..." /></Field>
+        <Field label="Descrição"><Textarea value={formData.description} onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))} /></Field>
+        <Field label="Observações"><Textarea value={formData.notes} onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))} /></Field>
       </FormDialog>
     </div>
   );
