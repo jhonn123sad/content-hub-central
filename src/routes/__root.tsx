@@ -11,7 +11,6 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
 
 import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -94,15 +93,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<any>(null);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false);
     });
 
     const {
@@ -116,19 +112,7 @@ function RootComponent() {
 
   const isAuthPage = location.pathname === "/auth";
 
-  useEffect(() => {
-    if (!loading && !session && !isAuthPage) {
-      navigate({ to: "/auth" });
-    }
-  }, [session, loading, isAuthPage, navigate]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Carregando...
-      </div>
-    );
-  }
+  if (isAuthPage) {
 
   if (isAuthPage) {
     return (
