@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReferenciasRouteImport } from './routes/referencias'
 import { Route as ProjetosRouteImport } from './routes/projetos'
+import { Route as CriativosRouteImport } from './routes/criativos'
 import { Route as ConteudosRouteImport } from './routes/conteudos'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const ReferenciasRoute = ReferenciasRouteImport.update({
 const ProjetosRoute = ProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CriativosRoute = CriativosRouteImport.update({
+  id: '/criativos',
+  path: '/criativos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConteudosRoute = ConteudosRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
+  '/criativos': typeof CriativosRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
+  '/criativos': typeof CriativosRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
@@ -51,20 +59,28 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
+  '/criativos': typeof CriativosRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/conteudos' | '/projetos' | '/referencias'
+  fullPaths: '/' | '/conteudos' | '/criativos' | '/projetos' | '/referencias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/conteudos' | '/projetos' | '/referencias'
-  id: '__root__' | '/' | '/conteudos' | '/projetos' | '/referencias'
+  to: '/' | '/conteudos' | '/criativos' | '/projetos' | '/referencias'
+  id:
+    | '__root__'
+    | '/'
+    | '/conteudos'
+    | '/criativos'
+    | '/projetos'
+    | '/referencias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConteudosRoute: typeof ConteudosRoute
+  CriativosRoute: typeof CriativosRoute
   ProjetosRoute: typeof ProjetosRoute
   ReferenciasRoute: typeof ReferenciasRoute
 }
@@ -83,6 +99,13 @@ declare module '@tanstack/react-router' {
       path: '/projetos'
       fullPath: '/projetos'
       preLoaderRoute: typeof ProjetosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/criativos': {
+      id: '/criativos'
+      path: '/criativos'
+      fullPath: '/criativos'
+      preLoaderRoute: typeof CriativosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/conteudos': {
@@ -105,6 +128,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConteudosRoute: ConteudosRoute,
+  CriativosRoute: CriativosRoute,
   ProjetosRoute: ProjetosRoute,
   ReferenciasRoute: ReferenciasRoute,
 }
