@@ -215,7 +215,7 @@ export function useCreateContent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (content: Partial<Content>) => {
-      const { data, error } = await (supabase as any).rpc("mvp_create_content", {
+      const { data, error } = await (supabase as any).rpc("mvp_create_content_v2", {
         p_project_id: content.project_id,
         p_title: content.title,
         p_description: content.description,
