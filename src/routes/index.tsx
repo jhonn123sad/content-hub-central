@@ -36,14 +36,14 @@ function Dashboard() {
   }
 
   const {
-    active_projects,
-    today_planned_contents,
-    ready_contents,
-    late_contents,
-    published_contents,
-    active_goals,
-    recent_references,
-    upcoming_contents
+    active_projects = 0,
+    today_planned_contents = 0,
+    ready_contents = 0,
+    late_contents = 0,
+    published_contents = 0,
+    active_goals = 0,
+    recent_references = [],
+    upcoming_contents = []
   } = summary;
 
   // Calculando meta diária simplificada (poderia ser movido para o RPC se necessário)
@@ -98,11 +98,11 @@ function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {upcoming_contents.length === 0 ? (
+              {(upcoming_contents || []).length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nada planejado.</p>
               ) : (
                 <ul className="divide-y">
-                  {upcoming_contents.map((c) => (
+                  {(upcoming_contents || []).map((c) => (
                     <li key={c.id} className="flex items-center justify-between py-3">
                       <div>
                         <p className="text-sm font-medium">{c.title || c.titulo}</p>
@@ -146,11 +146,11 @@ function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {recent_references.length === 0 ? (
+            {(recent_references || []).length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma referência ainda.</p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
-                {recent_references.slice(0, 4).map((r) => (
+                {(recent_references || []).slice(0, 4).map((r) => (
                   <li
                     key={r.id}
                     className="rounded-lg border bg-card p-3 text-sm"
