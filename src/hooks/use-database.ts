@@ -83,12 +83,17 @@ export function useProjects() {
     queryKey: ["projects"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("projects")
-        .select("*")
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+        .from("projetos")
+        .select("id, titulo, descricao, status, created_at, updated_at");
       if (error) throw error;
-      return data as Project[];
+      
+      return (data || []).map((p: any) => ({
+        id: p.id,
+        title: p.titulo,
+        description: p.descricao,
+        status: p.status,
+        active: true,
+      })) as Project[];
     },
   });
 }
@@ -98,8 +103,12 @@ export function useCreateProject() {
   return useMutation({
     mutationFn: async (project: Partial<Project>) => {
       const { data, error } = await (supabase as any)
-        .from("projects")
-        .insert([project])
+        .from("projetos")
+        .insert([{
+          titulo: project.title,
+          descricao: project.description,
+          status: project.status || 'active',
+        }])
         .select()
         .single();
       if (error) throw error;
@@ -116,8 +125,12 @@ export function useUpdateProject() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Project> & { id: string }) => {
       const { data, error } = await (supabase as any)
-        .from("projects")
-        .update(updates)
+        .from("projetos")
+        .update({
+          titulo: updates.title,
+          descricao: updates.description,
+          status: updates.status,
+        })
         .eq("id", id)
         .select()
         .single();
@@ -136,12 +149,21 @@ export function useContents() {
     queryKey: ["contents"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("contents")
-        .select("*")
-        .eq("active", true)
-        .order("planned_date", { ascending: true });
+        .from("conteudos")
+        .select("id, titulo, formato, status, url_midia, data_publicacao, projeto_id, created_at, updated_at");
       if (error) throw error;
-      return data as Content[];
+      
+      return (data || []).map((c: any) => ({
+        id: c.id,
+        title: c.titulo,
+        format: c.formato,
+        status: c.status,
+        drive_url: c.url_midia,
+        published_url: c.url_midia,
+        published_date: c.data_publicacao,
+        project_id: c.projeto_id,
+        active: true,
+      })) as Content[];
     },
   });
 }
@@ -151,8 +173,15 @@ export function useCreateContent() {
   return useMutation({
     mutationFn: async (content: Partial<Content>) => {
       const { data, error } = await (supabase as any)
-        .from("contents")
-        .insert([content])
+        .from("conteudos")
+        .insert([{
+          titulo: content.title,
+          formato: content.format,
+          status: content.status || 'idea',
+          url_midia: content.drive_url || content.published_url,
+          data_publicacao: content.published_date,
+          projeto_id: content.project_id,
+        }])
         .select()
         .single();
       if (error) throw error;
@@ -169,8 +198,15 @@ export function useUpdateContent() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Content> & { id: string }) => {
       const { data, error } = await (supabase as any)
-        .from("contents")
-        .update(updates)
+        .from("conteudos")
+        .update({
+          titulo: updates.title,
+          formato: updates.format,
+          status: updates.status,
+          url_midia: updates.drive_url || updates.published_url,
+          data_publicacao: updates.published_date,
+          projeto_id: updates.project_id,
+        })
         .eq("id", id)
         .select()
         .single();
@@ -189,12 +225,16 @@ export function useReferences() {
     queryKey: ["references"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("references")
-        .select("*")
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+        .from("referencias")
+        .select("id, titulo, url, created_at, updated_at");
       if (error) throw error;
-      return data as Reference[];
+      
+      return (data || []).map((r: any) => ({
+        id: r.id,
+        title: r.titulo,
+        url: r.url,
+        active: true,
+      })) as Reference[];
     },
   });
 }
@@ -204,8 +244,11 @@ export function useCreateReference() {
   return useMutation({
     mutationFn: async (reference: Partial<Reference>) => {
       const { data, error } = await (supabase as any)
-        .from("references")
-        .insert([reference])
+        .from("referencias")
+        .insert([{
+          titulo: reference.title,
+          url: reference.url,
+        }])
         .select()
         .single();
       if (error) throw error;
@@ -223,12 +266,18 @@ export function useCreatives() {
     queryKey: ["creatives"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("creatives")
-        .select("*")
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+        .from("criativos")
+        .select("id, nome, tipo_arquivo, url_arquivo, conteudo_id, created_at, updated_at");
       if (error) throw error;
-      return data as Creative[];
+      
+      return (data || []).map((c: any) => ({
+        id: c.id,
+        title: c.nome,
+        type: c.tipo_arquivo,
+        file_url: c.url_arquivo,
+        content_id: c.conteudo_id,
+        active: true,
+      })) as Creative[];
     },
   });
 }
@@ -238,8 +287,13 @@ export function useCreateCreative() {
   return useMutation({
     mutationFn: async (creative: Partial<Creative>) => {
       const { data, error } = await (supabase as any)
-        .from("creatives")
-        .insert([creative])
+        .from("criativos")
+        .insert([{
+          nome: creative.title,
+          tipo_arquivo: creative.type,
+          url_arquivo: creative.file_url,
+          conteudo_id: creative.content_id,
+        }])
         .select()
         .single();
       if (error) throw error;
@@ -257,12 +311,17 @@ export function useGoals() {
     queryKey: ["goals"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from("goals")
-        .select("*")
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+        .from("metas")
+        .select("id, titulo, objetivo_valor, prazo, created_at, updated_at");
       if (error) throw error;
-      return data as Goal[];
+      
+      return (data || []).map((g: any) => ({
+        id: g.id,
+        title: g.titulo,
+        target_count: g.objetivo_valor,
+        end_date: g.prazo,
+        active: true,
+      })) as Goal[];
     },
   });
 }
@@ -272,8 +331,12 @@ export function useCreateGoal() {
   return useMutation({
     mutationFn: async (goal: Partial<Goal>) => {
       const { data, error } = await (supabase as any)
-        .from("goals")
-        .insert([goal])
+        .from("metas")
+        .insert([{
+          titulo: goal.title,
+          objetivo_valor: goal.target_count,
+          prazo: goal.end_date,
+        }])
         .select()
         .single();
       if (error) throw error;
