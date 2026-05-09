@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Target } from "lucide-react";
 import { toast } from "sonner";
 
@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockGoals, mockProjects, mockContents } from "@/lib/mock-data";
+import { useGoals, useProjects, useContents, useCreateGoal } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/metas")({
   head: () => ({ meta: [{ title: "Metas — Central de Conteúdo" }] }),
@@ -22,7 +22,47 @@ export const Route = createFileRoute("/metas")({
 
 function GoalsPage() {
   const [open, setOpen] = useState(false);
+  const { data: goals = [], isLoading: isLoadingGoals } = useGoals();
+  const { data: projects = [] } = useProjects();
+  const { data: contents = [] } = useContents();
+  const createGoal = useCreateGoal();
+
+  const [formData, setFormData] = useState({
+    project_id: "",
+    title: "",
+    goal_type: "diaria",
+    target_count: "1",
+    period: "",
+    start_date: "",
+    end_date: "",
+    status: "active",
+  });
+
   const today = new Date().toISOString().slice(0, 10);
+
+  const handleSubmit = async () => {
+    try {
+      await createGoal.mutateAsync({
+        ...formData,
+        target_count: parseInt(formData.target_count) || 0,
+        project_id: formData.project_id || null,
+      });
+      toast.success("Meta salva!");
+      setOpen(false);
+      setFormData({
+        project_id: "",
+        title: "",
+        goal_type: "diaria",
+        target_count: "1",
+        period: "",
+        start_date: "",
+        end_date: "",
+        status: "active",
+      });
+    } catch (error) {
+      toast.error("Erro ao salvar meta");
+    }
+  };
 
   return (
     <div>
@@ -32,7 +72,9 @@ function GoalsPage() {
         action={<Button onClick={() => setOpen(true)}><Plus className="mr-2 h-4 w-4" /> Nova meta</Button>}
       />
       <div className="space-y-6 p-6">
-        {mockGoals.length === 0 ? (
+        {isLoadingGoals ? (
+          <div className="flex justify-center p-12">Carregando metas...</div>
+        ) : goals.length === 0 ? (
           <EmptyState
             icon={<Target className="h-6 w-6" />}
             title="Nenhuma meta definida"
@@ -41,27 +83,28 @@ function GoalsPage() {
           />
         ) : (
           <div className="grid gap-4 lg:grid-cols-2">
-            {mockGoals.map((g) => {
-              const project = mockProjects.find((p) => p.id === g.projectId);
-              const projectContents = mockContents.filter((c) => c.projectId === g.projectId);
+            {goals.map((g) => {
+              const project = projects.find((p) => p.id === g.project_id);
+              const projectContents = contents.filter((c) => c.project_id === g.project_id);
               const planned = projectContents.length;
               const published = projectContents.filter((c) => c.status === "published").length;
-              const late = projectContents.filter((c) => c.plannedDate < today && c.status !== "published").length;
-              const pct = Math.min(100, Math.round((published / g.target) * 100));
+              const late = projectContents.filter((c) => c.planned_date && c.planned_date < today && c.status !== "published").length;
+              const target = g.target_count || 1;
+              const pct = Math.min(100, Math.round((published / target) * 100));
               return (
                 <Card key={g.id}>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
-                      <CardTitle className="text-base">{project?.name ?? "—"}</CardTitle>
+                      <CardTitle className="text-base">{g.title} ({project?.title ?? "—"})</CardTitle>
                       <p className="text-xs text-muted-foreground">{g.period}</p>
                     </div>
-                    <Badge variant="outline">{g.type}</Badge>
+                    <Badge variant="outline">{g.goal_type}</Badge>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
                       <div className="mb-1 flex items-center justify-between text-sm">
                         <span>Progresso</span>
-                        <span className="font-medium">{published}/{g.target}</span>
+                        <span className="font-medium">{published}/{target}</span>
                       </div>
                       <Progress value={pct} />
                     </div>
@@ -79,16 +122,17 @@ function GoalsPage() {
       </div>
 
       <FormDialog open={open} onOpenChange={setOpen} title="Nova meta"
-        onSubmit={() => { toast.success("Meta salva (mock)"); setOpen(false); }}>
+        onSubmit={handleSubmit}>
+        <Field label="Título"><Input value={formData.title} onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))} placeholder="Ex: Meta de inscritos" /></Field>
         <Field label="Projeto">
-          <Select>
+          <Select value={formData.project_id} onValueChange={v => setFormData(prev => ({ ...prev, project_id: v }))}>
             <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-            <SelectContent>{mockProjects.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
           </Select>
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Tipo de meta">
-            <Select>
+            <Select value={formData.goal_type} onValueChange={v => setFormData(prev => ({ ...prev, goal_type: v }))}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="diaria">Diária</SelectItem>
@@ -97,15 +141,15 @@ function GoalsPage() {
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Quantidade alvo"><Input type="number" min={0} /></Field>
+          <Field label="Quantidade alvo"><Input type="number" min={0} value={formData.target_count} onChange={e => setFormData(prev => ({ ...prev, target_count: e.target.value }))} /></Field>
         </div>
-        <Field label="Período"><Input placeholder="Ex: Janeiro 2025" /></Field>
+        <Field label="Período"><Input value={formData.period} onChange={e => setFormData(prev => ({ ...prev, period: e.target.value }))} placeholder="Ex: Janeiro 2025" /></Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Data inicial"><Input type="date" /></Field>
-          <Field label="Data final"><Input type="date" /></Field>
+          <Field label="Data inicial"><Input type="date" value={formData.start_date} onChange={e => setFormData(prev => ({ ...prev, start_date: e.target.value }))} /></Field>
+          <Field label="Data final"><Input type="date" value={formData.end_date} onChange={e => setFormData(prev => ({ ...prev, end_date: e.target.value }))} /></Field>
         </div>
         <Field label="Status">
-          <Select>
+          <Select value={formData.status} onValueChange={v => setFormData(prev => ({ ...prev, status: v }))}>
             <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="active">Ativa</SelectItem>
