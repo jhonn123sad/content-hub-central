@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReferenciasRouteImport } from './routes/referencias'
 import { Route as ProjetosRouteImport } from './routes/projetos'
+import { Route as MetasRouteImport } from './routes/metas'
 import { Route as CriativosRouteImport } from './routes/criativos'
 import { Route as ConteudosRouteImport } from './routes/conteudos'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const ReferenciasRoute = ReferenciasRouteImport.update({
 const ProjetosRoute = ProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CriativosRoute = CriativosRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/criativos': typeof CriativosRoute
+  '/metas': typeof MetasRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/criativos': typeof CriativosRoute
+  '/metas': typeof MetasRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
@@ -60,19 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/criativos': typeof CriativosRoute
+  '/metas': typeof MetasRoute
   '/projetos': typeof ProjetosRoute
   '/referencias': typeof ReferenciasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/conteudos' | '/criativos' | '/projetos' | '/referencias'
+  fullPaths:
+    | '/'
+    | '/conteudos'
+    | '/criativos'
+    | '/metas'
+    | '/projetos'
+    | '/referencias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/conteudos' | '/criativos' | '/projetos' | '/referencias'
+  to:
+    | '/'
+    | '/conteudos'
+    | '/criativos'
+    | '/metas'
+    | '/projetos'
+    | '/referencias'
   id:
     | '__root__'
     | '/'
     | '/conteudos'
     | '/criativos'
+    | '/metas'
     | '/projetos'
     | '/referencias'
   fileRoutesById: FileRoutesById
@@ -81,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConteudosRoute: typeof ConteudosRoute
   CriativosRoute: typeof CriativosRoute
+  MetasRoute: typeof MetasRoute
   ProjetosRoute: typeof ProjetosRoute
   ReferenciasRoute: typeof ReferenciasRoute
 }
@@ -99,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/projetos'
       fullPath: '/projetos'
       preLoaderRoute: typeof ProjetosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/criativos': {
@@ -129,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConteudosRoute: ConteudosRoute,
   CriativosRoute: CriativosRoute,
+  MetasRoute: MetasRoute,
   ProjetosRoute: ProjetosRoute,
   ReferenciasRoute: ReferenciasRoute,
 }
