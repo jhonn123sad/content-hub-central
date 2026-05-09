@@ -158,7 +158,7 @@ export type Database = {
           status: string | null
           titulo: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -167,7 +167,7 @@ export type Database = {
           status?: string | null
           titulo: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -176,7 +176,7 @@ export type Database = {
           status?: string | null
           titulo?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -212,7 +212,75 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mvp_archive_project: {
+        Args: { p_id: string }
+        Returns: {
+          created_at: string
+          descricao: string | null
+          id: string
+          status: string | null
+          titulo: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projetos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mvp_create_project: {
+        Args: { p_description: string; p_status: string; p_title: string }
+        Returns: {
+          created_at: string
+          descricao: string | null
+          id: string
+          status: string | null
+          titulo: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projetos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mvp_list_projects: {
+        Args: never
+        Returns: {
+          active: boolean
+          description: string
+          id: string
+          status: string
+          title: string
+        }[]
+      }
+      mvp_update_project: {
+        Args: {
+          p_description: string
+          p_id: string
+          p_status: string
+          p_title: string
+        }
+        Returns: {
+          created_at: string
+          descricao: string | null
+          id: string
+          status: string | null
+          titulo: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projetos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
