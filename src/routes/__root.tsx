@@ -7,11 +7,9 @@ import {
   HeadContent,
   Scripts,
   useLocation,
-  useNavigate,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
 
 import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -94,41 +92,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const isAuthPage = location.pathname === "/auth";
-
-  useEffect(() => {
-    if (!loading && !session && !isAuthPage) {
-      navigate({ to: "/auth" });
-    }
-  }, [session, loading, isAuthPage, navigate]);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Carregando...
-      </div>
-    );
-  }
 
   if (isAuthPage) {
     return (
@@ -149,16 +115,8 @@ function RootComponent() {
               <SidebarTrigger />
               <div className="flex flex-1 items-center justify-between">
                 <span className="text-sm text-muted-foreground">
-                  Central de Conteúdo · MVP (Supabase Externo)
+                  Central de Conteúdo · MVP
                 </span>
-                {session && (
-                  <button
-                    onClick={() => supabase.auth.signOut()}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Sair
-                  </button>
-                )}
               </div>
             </header>
             <main className="flex-1">
