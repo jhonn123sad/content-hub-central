@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReferenciasRouteImport } from './routes/referencias'
 import { Route as ProjetosRouteImport } from './routes/projetos'
 import { Route as ConteudosRouteImport } from './routes/conteudos'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ReferenciasRoute = ReferenciasRouteImport.update({
+  id: '/referencias',
+  path: '/referencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjetosRoute = ProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/projetos': typeof ProjetosRoute
+  '/referencias': typeof ReferenciasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/projetos': typeof ProjetosRoute
+  '/referencias': typeof ReferenciasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/conteudos': typeof ConteudosRoute
   '/projetos': typeof ProjetosRoute
+  '/referencias': typeof ReferenciasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/conteudos' | '/projetos'
+  fullPaths: '/' | '/conteudos' | '/projetos' | '/referencias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/conteudos' | '/projetos'
-  id: '__root__' | '/' | '/conteudos' | '/projetos'
+  to: '/' | '/conteudos' | '/projetos' | '/referencias'
+  id: '__root__' | '/' | '/conteudos' | '/projetos' | '/referencias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConteudosRoute: typeof ConteudosRoute
   ProjetosRoute: typeof ProjetosRoute
+  ReferenciasRoute: typeof ReferenciasRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/referencias': {
+      id: '/referencias'
+      path: '/referencias'
+      fullPath: '/referencias'
+      preLoaderRoute: typeof ReferenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projetos': {
       id: '/projetos'
       path: '/projetos'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConteudosRoute: ConteudosRoute,
   ProjetosRoute: ProjetosRoute,
+  ReferenciasRoute: ReferenciasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
