@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge, type ContentStatus } from "@/components/status-badge";
-import { useContents, useProjects, useReferences } from "@/hooks/use-database";
+import { useDashboardSummary } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,31 +25,30 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { data: contents = [], isLoading: isLoadingContents } = useContents();
-  const { data: projects = [], isLoading: isLoadingProjects } = useProjects();
-  const { data: references = [], isLoading: isLoadingRefs } = useReferences();
+  const { data: summary, isLoading } = useDashboardSummary();
 
-  const today = new Date().toISOString().slice(0, 10);
-  
-  const plannedToday = contents.filter((c) => c.planned_date === today);
-  const ready = contents.filter((c) => c.status === "ready" || c.status === "scheduled");
-  const late = contents.filter(
-    (c) => c.planned_date && c.planned_date < today && !["published", "archived"].includes(c.status),
-  );
-  
-  const activeProjects = projects.filter((p) => p.status === "active");
-  const dailyTarget = activeProjects.reduce((acc, p) => acc + (p.daily_content_goal || 0), 0) || 1;
-  const dailyDone = contents.filter(
-    (c) => c.published_date === today,
-  ).length;
-  const dailyPct = Math.min(100, Math.round((dailyDone / dailyTarget) * 100));
-  
-  const upcoming = [...contents]
-    .filter((c) => c.planned_date && c.planned_date >= today)
-    .sort((a, b) => (a.planned_date || "").localeCompare(b.planned_date || ""))
-    .slice(0, 5);
+  if (isLoading || !summary) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Carregando dashboard...
+      </div>
+    );
+  }
 
-  const isLoading = isLoadingContents || isLoadingProjects || isLoadingRefs;
+  const {
+    active_projects,
+    today_planned_contents,
+    ready_contents,
+    late_contents,
+    published_contents,
+    active_goals,
+    recent_references,
+    upcoming_contents
+  } = summary;
+
+  // Calculando meta diária simplificada (poderia ser movido para o RPC se necessário)
+  const dailyTarget = 1; // Simplificado para o MVP
+  const dailyPct = Math.min(100, Math.round((published_contents / dailyTarget) * 100));
 
   if (isLoading) {
     return (
@@ -70,24 +69,24 @@ function Dashboard() {
           <StatCard
             icon={<CalendarDays className="h-4 w-4" />}
             label="Planejados hoje"
-            value={plannedToday.length}
+            value={today_planned_contents}
           />
           <StatCard
             icon={<CheckCircle2 className="h-4 w-4" />}
             label="Prontos para publicar"
-            value={ready.length}
+            value={ready_contents}
             tone="success"
           />
           <StatCard
             icon={<Clock className="h-4 w-4" />}
             label="Em atraso"
-            value={late.length}
+            value={late_contents}
             tone="destructive"
           />
           <StatCard
             icon={<FolderKanban className="h-4 w-4" />}
             label="Projetos ativos"
-            value={activeProjects.length}
+            value={active_projects}
           />
         </div>
 
@@ -99,19 +98,19 @@ function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {upcoming.length === 0 ? (
+              {upcoming_contents.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nada planejado.</p>
               ) : (
                 <ul className="divide-y">
-                  {upcoming.map((c) => (
+                  {upcoming_contents.map((c) => (
                     <li key={c.id} className="flex items-center justify-between py-3">
                       <div>
-                        <p className="text-sm font-medium">{c.title}</p>
+                        <p className="text-sm font-medium">{c.title || c.titulo}</p>
                         <p className="text-xs text-muted-foreground">
-                          {c.planned_date} · {c.platform}
+                          {c.planned_date || c.data_planejada} · {c.platform || c.plataforma}
                         </p>
                       </div>
-                      <StatusBadge status={c.status as ContentStatus} />
+                      <StatusBadge status={(c.status) as ContentStatus} />
                     </li>
                   ))}
                 </ul>
@@ -127,7 +126,7 @@ function Dashboard() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="text-3xl font-semibold">
-                {dailyDone}
+                {published_contents}
                 <span className="text-base font-normal text-muted-foreground">
                   {" "}/ {dailyTarget}
                 </span>
@@ -147,17 +146,17 @@ function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {references.length === 0 ? (
+            {recent_references.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma referência ainda.</p>
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
-                {references.slice(0, 4).map((r) => (
+                {recent_references.slice(0, 4).map((r) => (
                   <li
                     key={r.id}
                     className="rounded-lg border bg-card p-3 text-sm"
                   >
-                    <p className="font-medium">{r.title}</p>
-                    <p className="text-xs text-muted-foreground">{r.type}</p>
+                    <p className="font-medium">{r.title || r.titulo}</p>
+                    <p className="text-xs text-muted-foreground">{r.type || r.tipo}</p>
                   </li>
                 ))}
               </ul>
