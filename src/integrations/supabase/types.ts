@@ -14,7 +14,199 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conteudos: {
+        Row: {
+          created_at: string
+          data_publicacao: string | null
+          formato: string | null
+          id: string
+          projeto_id: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          url_midia: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_publicacao?: string | null
+          formato?: string | null
+          id?: string
+          projeto_id?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+          url_midia?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_publicacao?: string | null
+          formato?: string | null
+          id?: string
+          projeto_id?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          url_midia?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conteudos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      criativos: {
+        Row: {
+          conteudo_id: string | null
+          created_at: string
+          id: string
+          nome: string
+          tipo_arquivo: string | null
+          url_arquivo: string
+          user_id: string
+        }
+        Insert: {
+          conteudo_id?: string | null
+          created_at?: string
+          id?: string
+          nome: string
+          tipo_arquivo?: string | null
+          url_arquivo: string
+          user_id: string
+        }
+        Update: {
+          conteudo_id?: string | null
+          created_at?: string
+          id?: string
+          nome?: string
+          tipo_arquivo?: string | null
+          url_arquivo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "criativos_conteudo_id_fkey"
+            columns: ["conteudo_id"]
+            isOneToOne: false
+            referencedRelation: "conteudos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metas: {
+        Row: {
+          created_at: string
+          id: string
+          objetivo_valor: number | null
+          prazo: string | null
+          progresso_valor: number | null
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          objetivo_valor?: number | null
+          prazo?: string | null
+          progresso_valor?: number | null
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          objetivo_valor?: number | null
+          prazo?: string | null
+          progresso_valor?: number | null
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projetos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          status: string | null
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          status?: string | null
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          status?: string | null
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referencias: {
+        Row: {
+          created_at: string
+          id: string
+          tags: string[] | null
+          titulo: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          titulo: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          titulo?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
