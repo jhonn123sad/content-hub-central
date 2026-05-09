@@ -34,7 +34,7 @@ export type Database = {
           titulo: string
           updated_at: string
           url_midia: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -55,7 +55,7 @@ export type Database = {
           titulo: string
           updated_at?: string
           url_midia?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -76,7 +76,7 @@ export type Database = {
           titulo?: string
           updated_at?: string
           url_midia?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -356,7 +356,7 @@ export type Database = {
           titulo: string
           updated_at: string
           url_midia: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -494,7 +494,52 @@ export type Database = {
           titulo: string
           updated_at: string
           url_midia: string | null
-          user_id: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "conteudos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mvp_create_content_v2: {
+        Args: {
+          p_description: string
+          p_drive_url: string
+          p_format: string
+          p_image_url: string
+          p_notes: string
+          p_planned_date: string
+          p_platform: string
+          p_priority: string
+          p_project_id: string
+          p_published_date: string
+          p_published_url: string
+          p_script_or_copy: string
+          p_status: string
+          p_title: string
+        }
+        Returns: {
+          created_at: string
+          data_publicacao: string | null
+          description: string | null
+          drive_url: string | null
+          formato: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          planned_date: string | null
+          platform: string | null
+          priority: string | null
+          projeto_id: string | null
+          published_url: string | null
+          script_or_copy: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          url_midia: string | null
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -739,7 +784,7 @@ export type Database = {
           titulo: string
           updated_at: string
           url_midia: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"

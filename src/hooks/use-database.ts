@@ -215,7 +215,7 @@ export function useCreateContent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (content: Partial<Content>) => {
-      const { data, error } = await (supabase as any).rpc("mvp_create_content", {
+      const { data, error } = await (supabase as any).rpc("mvp_create_content_v2", {
         p_project_id: content.project_id,
         p_title: content.title,
         p_description: content.description,
@@ -224,8 +224,8 @@ export function useCreateContent() {
         p_format: content.format,
         p_platform: content.platform,
         p_priority: content.priority || 'medium',
-        p_planned_date: content.planned_date,
-        p_published_date: content.published_date,
+        p_planned_date: content.planned_date || null,
+        p_published_date: content.published_date || null,
         p_drive_url: content.drive_url,
         p_published_url: content.published_url,
         p_image_url: content.image_url,
