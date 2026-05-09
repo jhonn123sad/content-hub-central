@@ -6,7 +6,12 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
+  useNavigate,
 } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
 import appCss from "../styles.css?url";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -64,14 +69,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Central de Conteúdo" },
       { name: "description", content: "Sistema para organizar projetos, conteúdos, referências e metas." },
-      { property: "og:title", content: "Central de Conteúdo" },
-      { name: "twitter:title", content: "Central de Conteúdo" },
-      { property: "og:description", content: "Sistema para organizar projetos, conteúdos, referências e metas." },
-      { name: "twitter:description", content: "Sistema para organizar projetos, conteúdos, referências e metas." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4907b1fd-83fd-452b-b804-6553261cc8ce/id-preview-818128b0--00a95854-d876-493e-b0e0-1e1b5092c73e.lovable.app-1778290589331.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4907b1fd-83fd-452b-b804-6553261cc8ce/id-preview-818128b0--00a95854-d876-493e-b0e0-1e1b5092c73e.lovable.app-1778290589331.png" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:type", content: "website" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
@@ -97,6 +94,50 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const isAuthPage = location.pathname === "/auth";
+
+  useEffect(() => {
+    if (!loading && !session && !isAuthPage) {
+      navigate({ to: "/auth" });
+    }
+  }, [session, loading, isAuthPage, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Carregando...
+      </div>
+    );
+  }
+
+  if (isAuthPage) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -106,9 +147,19 @@ function RootComponent() {
           <div className="flex min-h-screen flex-1 flex-col">
             <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur">
               <SidebarTrigger />
-              <span className="text-sm text-muted-foreground">
-                Dados de exemplo · MVP
-              </span>
+              <div className="flex flex-1 items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Central de Conteúdo · MVP (Supabase Externo)
+                </span>
+                {session && (
+                  <button
+                    onClick={() => supabase.auth.signOut()}
+                    className="text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Sair
+                  </button>
+                )}
+              </div>
             </header>
             <main className="flex-1">
               <Outlet />
