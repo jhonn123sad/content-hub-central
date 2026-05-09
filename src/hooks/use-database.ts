@@ -84,19 +84,15 @@ export function useProjects() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("projetos")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("id, titulo, descricao, status, created_at, updated_at");
       if (error) throw error;
       
-      // Map view fields to UI type
       return (data || []).map((p: any) => ({
         id: p.id,
         title: p.titulo,
         description: p.descricao,
         status: p.status,
-        created_at: p.created_at,
-        updated_at: p.updated_at,
-        active: true, // View implies active
+        active: true,
       })) as Project[];
     },
   });
@@ -154,8 +150,7 @@ export function useContents() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("conteudos")
-        .select("*")
-        .order("data_publicacao", { ascending: true });
+        .select("id, titulo, formato, status, url_midia, data_publicacao, projeto_id, created_at, updated_at");
       if (error) throw error;
       
       return (data || []).map((c: any) => ({
@@ -231,8 +226,7 @@ export function useReferences() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("referencias")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("id, titulo, url, created_at, updated_at");
       if (error) throw error;
       
       return (data || []).map((r: any) => ({
@@ -273,8 +267,7 @@ export function useCreatives() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("criativos")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("id, nome, tipo_arquivo, url_arquivo, conteudo_id, created_at, updated_at");
       if (error) throw error;
       
       return (data || []).map((c: any) => ({
@@ -319,8 +312,7 @@ export function useGoals() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("metas")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("id, titulo, objetivo_valor, prazo, created_at, updated_at");
       if (error) throw error;
       
       return (data || []).map((g: any) => ({
