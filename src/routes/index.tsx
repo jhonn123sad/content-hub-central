@@ -155,8 +155,8 @@ function Dashboard() {
                     key={r.id}
                     className="rounded-lg border bg-card p-3 text-sm"
                   >
-                    <p className="font-medium">{r.title || r.titulo}</p>
-                    <p className="text-xs text-muted-foreground">{r.type || r.tipo}</p>
+                    <p className="font-medium">{r.title}</p>
+                    <p className="text-xs text-muted-foreground">{r.type}</p>
                   </li>
                 ))}
               </ul>
