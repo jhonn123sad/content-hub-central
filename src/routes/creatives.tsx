@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Plus, Image as ImageIcon } from "lucide-react";
+import { Plus, Image as ImageIcon, MoreVertical, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -13,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreatives, useProjects, useContents, useCreateCreative } from "@/hooks/use-database";
+import { useCreatives, useProjects, useContents, useCreateCreative, useUpdateCreative, useDeleteCreative } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/creatives")({
   head: () => ({ meta: [{ title: "Criativos — Central de Conteúdo" }] }),
@@ -25,15 +31,18 @@ const statuses = ["draft", "review", "approved", "published"];
 
 function CreativesPage() {
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
   const [contentFilter, setContentFilter] = useState("all");
-
+ 
   const { data: creatives = [], isLoading: isLoadingCreatives } = useCreatives();
   const { data: projects = [] } = useProjects();
   const { data: contents = [] } = useContents();
   const createCreative = useCreateCreative();
+  const updateCreative = useUpdateCreative();
+  const deleteCreative = useDeleteCreative();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -57,27 +66,69 @@ function CreativesPage() {
 
   const handleSubmit = async () => {
     try {
-      await createCreative.mutateAsync({
-        ...formData,
-        project_id: formData.project_id || null,
-        content_id: formData.content_id || null,
-      });
-      toast.success("Criativo salvo!");
-      setOpen(false);
-      setFormData({
-        title: "",
-        type: "thumbnail",
-        status: "draft",
-        project_id: "",
-        content_id: "",
-        file_url: "",
-        image_url: "",
-        description: "",
-        notes: "",
-      });
+      if (editingId) {
+        await updateCreative.mutateAsync({
+          id: editingId,
+          ...formData,
+          project_id: formData.project_id || null,
+          content_id: formData.content_id || null,
+        });
+        toast.success("Criativo atualizado!");
+      } else {
+        await createCreative.mutateAsync({
+          ...formData,
+          project_id: formData.project_id || null,
+          content_id: formData.content_id || null,
+        });
+        toast.success("Criativo salvo!");
+      }
+      handleClose();
     } catch (error) {
       toast.error("Erro ao salvar criativo");
     }
+  };
+
+  const handleEdit = (c: any) => {
+    setEditingId(c.id);
+    setFormData({
+      title: c.title || "",
+      type: c.type || "thumbnail",
+      status: c.status || "draft",
+      project_id: c.project_id || "",
+      content_id: c.content_id || "",
+      file_url: c.file_url || "",
+      image_url: c.image_url || "",
+      description: c.description || "",
+      notes: c.notes || "",
+    });
+    setOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Excluir este criativo?")) {
+      try {
+        await deleteCreative.mutateAsync(id);
+        toast.success("Criativo excluído");
+      } catch (error) {
+        toast.error("Erro ao excluir");
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditingId(null);
+    setFormData({
+      title: "",
+      type: "thumbnail",
+      status: "draft",
+      project_id: "",
+      content_id: "",
+      file_url: "",
+      image_url: "",
+      description: "",
+      notes: "",
+    });
   };
 
   return (
@@ -107,14 +158,45 @@ function CreativesPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
-              <Card key={c.id}>
+              <Card key={c.id} className="group overflow-hidden transition-all hover:shadow-md">
+                {c.image_url && (
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    <img src={c.image_url} alt={c.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                  </div>
+                )}
                 <CardContent className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold">{c.title}</h3>
-                    <Badge variant="outline">{c.type}</Badge>
+                    <div className="flex-1">
+                      <h3 className="font-semibold leading-tight">{c.title}</h3>
+                      <div className="flex gap-1.5 mt-1">
+                        <Badge variant="outline" className="text-[10px] h-4 uppercase">{c.type}</Badge>
+                        <Badge variant="secondary" className="text-[10px] h-4 uppercase">{c.status}</Badge>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEdit(c)}>
+                          <Pencil className="mr-2 h-4 w-4" /> Editar
+                        </DropdownMenuItem>
+                        {c.file_url && (
+                          <DropdownMenuItem asChild>
+                            <a href={c.file_url} target="_blank" rel="noreferrer">
+                              <ExternalLink className="mr-2 h-4 w-4" /> Abrir arquivo
+                            </a>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(c.id)}>
+                          <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <Badge variant="secondary">{c.status}</Badge>
-                  <p className="text-sm text-muted-foreground">{c.description}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{c.description || "Sem descrição"}</p>
                 </CardContent>
               </Card>
             ))}
@@ -122,7 +204,10 @@ function CreativesPage() {
         )}
       </div>
 
-      <FormDialog open={open} onOpenChange={setOpen} title="Novo criativo"
+      <FormDialog 
+        open={open} 
+        onOpenChange={(val) => !val && handleClose()} 
+        title={editingId ? "Editar criativo" : "Novo criativo"}
         onSubmit={handleSubmit}>
         <Field label="Título"><Input value={formData.title} onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))} /></Field>
         <div className="grid gap-4 sm:grid-cols-2">
