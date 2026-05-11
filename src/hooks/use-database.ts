@@ -240,6 +240,34 @@ export function useCreateReference() {
   });
 }
 
+export function useUpdateReference() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Reference> & { id: string }) => {
+      const { data, error } = await supabase.from("references").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["references"] });
+    },
+  });
+}
+
+export function useDeleteReference() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("references").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["references"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
 // Creatives Hooks
 export function useCreatives() {
   return useQuery({
@@ -259,6 +287,34 @@ export function useCreateCreative() {
       const { data, error } = await supabase.from("creatives").insert([creative as any]).select().single();
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creatives"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
+export function useUpdateCreative() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Creative> & { id: string }) => {
+      const { data, error } = await supabase.from("creatives").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creatives"] });
+    },
+  });
+}
+
+export function useDeleteCreative() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("creatives").delete().eq("id", id);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creatives"] });
