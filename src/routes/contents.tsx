@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { Plus, FileText, Filter, LayoutGrid, List, Search, MoreHorizontal } from "lucide-react";
+import { Plus, FileText, Filter, LayoutGrid, List, Search, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
