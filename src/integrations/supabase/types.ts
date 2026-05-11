@@ -31,6 +31,7 @@ export type Database = {
           published_date: string | null
           published_url: string | null
           script_or_copy: string | null
+          sort_order: number | null
           status: string
           title: string
           updated_at: string
@@ -52,6 +53,7 @@ export type Database = {
           published_date?: string | null
           published_url?: string | null
           script_or_copy?: string | null
+          sort_order?: number | null
           status?: string
           title: string
           updated_at?: string
@@ -73,6 +75,7 @@ export type Database = {
           published_date?: string | null
           published_url?: string | null
           script_or_copy?: string | null
+          sort_order?: number | null
           status?: string
           title?: string
           updated_at?: string
@@ -353,6 +356,7 @@ export type Database = {
           published_date: string | null
           published_url: string | null
           script_or_copy: string | null
+          sort_order: number | null
           status: string
           title: string
           updated_at: string
@@ -491,6 +495,7 @@ export type Database = {
           published_date: string | null
           published_url: string | null
           script_or_copy: string | null
+          sort_order: number | null
           status: string
           title: string
           updated_at: string
@@ -536,6 +541,7 @@ export type Database = {
           published_date: string | null
           published_url: string | null
           script_or_copy: string | null
+          sort_order: number | null
           status: string
           title: string
           updated_at: string
@@ -781,6 +787,7 @@ export type Database = {
           published_date: string | null
           published_url: string | null
           script_or_copy: string | null
+          sort_order: number | null
           status: string
           title: string
           updated_at: string
