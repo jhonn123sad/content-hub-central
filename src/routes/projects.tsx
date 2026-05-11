@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, FolderKanban } from "lucide-react";
+import { Plus, FolderKanban, Pencil, Trash2, Globe, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -19,7 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useProjects, useCreateProject } from "@/hooks/use-database";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from "@/hooks/use-database";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({ meta: [{ title: "Projetos — Central de Conteúdo" }] }),
@@ -30,6 +36,10 @@ function ProjectsPage() {
   const [open, setOpen] = useState(false);
   const { data: projects = [], isLoading } = useProjects();
   const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
+  const deleteProject = useDeleteProject();
+
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -46,26 +56,67 @@ function ProjectsPage() {
 
   const handleSubmit = async () => {
     try {
-      await createProject.mutateAsync({
-        ...formData,
-        daily_content_goal: parseInt(formData.daily_content_goal) || 0,
-      });
-      toast.success("Projeto salvo com sucesso!");
-      setOpen(false);
-      setFormData({
-        title: "",
-        description: "",
-        objective: "",
-        niche: "",
-        main_platform: "",
-        status: "active",
-        daily_content_goal: "0",
-        drive_url: "",
-        start_date: "",
-      });
+      if (editingId) {
+        await updateProject.mutateAsync({
+          id: editingId,
+          ...formData,
+          daily_content_goal: parseInt(formData.daily_content_goal) || 0,
+        });
+        toast.success("Projeto atualizado!");
+      } else {
+        await createProject.mutateAsync({
+          ...formData,
+          daily_content_goal: parseInt(formData.daily_content_goal) || 0,
+        });
+        toast.success("Projeto criado!");
+      }
+      handleClose();
     } catch (error) {
       toast.error("Erro ao salvar projeto");
     }
+  };
+
+  const handleEdit = (p: any) => {
+    setEditingId(p.id);
+    setFormData({
+      title: p.title || "",
+      description: p.description || "",
+      objective: p.objective || "",
+      niche: p.niche || "",
+      main_platform: p.main_platform || "",
+      status: p.status || "active",
+      daily_content_goal: String(p.daily_content_goal || 0),
+      drive_url: p.drive_url || "",
+      start_date: p.start_date || "",
+    });
+    setOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este projeto?")) {
+      try {
+        await deleteProject.mutateAsync(id);
+        toast.success("Projeto excluído");
+      } catch (error) {
+        toast.error("Erro ao excluir projeto");
+      }
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditingId(null);
+    setFormData({
+      title: "",
+      description: "",
+      objective: "",
+      niche: "",
+      main_platform: "",
+      status: "active",
+      daily_content_goal: "0",
+      drive_url: "",
+      start_date: "",
+    });
   };
 
   return (
@@ -96,21 +147,49 @@ function ProjectsPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (
-              <Card key={p.id}>
+              <Card key={p.id} className="group overflow-hidden transition-all hover:shadow-md">
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-semibold">{p.title}</h3>
-                      <p className="text-xs text-muted-foreground">{p.niche}</p>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg leading-tight">{p.title}</h3>
+                      <p className="text-xs font-medium text-primary mt-1">{p.niche}</p>
                     </div>
-                    <Badge variant="outline">{p.main_platform}</Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEdit(p)}>
+                          <Pencil className="mr-2 h-4 w-4" /> Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(p.id)}>
+                          <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {p.description}
+                  
+                  <p className="text-sm text-muted-foreground line-clamp-2 h-10">
+                    {p.description || "Sem descrição"}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Meta: {p.daily_content_goal}/dia</span>
-                    <span>Desde {p.start_date || "—"}</span>
+                  
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Badge variant="secondary" className="text-[10px] uppercase font-bold">
+                      {p.main_platform}
+                    </Badge>
+                    <Badge variant={p.status === "active" ? "default" : "outline"} className="text-[10px] uppercase font-bold">
+                      {p.status === "active" ? "Ativo" : p.status === "paused" ? "Pausado" : "Arquivado"}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
+                      <span>{p.daily_content_goal}/dia</span>
+                    </div>
+                    <span>Desde {p.start_date ? new Date(p.start_date).toLocaleDateString() : "—"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -121,8 +200,8 @@ function ProjectsPage() {
 
       <FormDialog
         open={open}
-        onOpenChange={setOpen}
-        title="Novo projeto"
+        onOpenChange={(val) => !val && handleClose()}
+        title={editingId ? "Editar projeto" : "Novo projeto"}
         description="Defina os dados principais do projeto"
         onSubmit={handleSubmit}
       >
