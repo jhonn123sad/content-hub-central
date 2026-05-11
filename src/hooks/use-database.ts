@@ -318,8 +318,8 @@ export function useCreateReference() {
   return useMutation({
     mutationFn: async (reference: Partial<Reference>) => {
       const { data, error } = await (supabase as any).rpc("mvp_create_reference", {
-        p_project_id: reference.project_id,
-        p_content_id: reference.content_id,
+        p_project_id: reference.project_id || null,
+        p_content_id: reference.content_id || null,
         p_title: reference.title,
         p_description: reference.description,
         p_type: reference.type,
