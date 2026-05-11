@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreatives, useProjects, useContents, useCreateCreative } from "@/hooks/use-database";
 
-export const Route = createFileRoute("/criativos")({
+export const Route = createFileRoute("/creatives")({
   head: () => ({ meta: [{ title: "Criativos — Central de Conteúdo" }] }),
   component: CreativesPage,
 });
