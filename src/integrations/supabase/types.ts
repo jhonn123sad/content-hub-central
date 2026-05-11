@@ -101,7 +101,7 @@ export type Database = {
           status: string | null
           title: string
           type: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           content_id?: string | null
@@ -115,7 +115,7 @@ export type Database = {
           status?: string | null
           title: string
           type?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           content_id?: string | null
@@ -129,7 +129,7 @@ export type Database = {
           status?: string | null
           title?: string
           type?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -161,7 +161,7 @@ export type Database = {
           status: string | null
           target_count: number | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -175,7 +175,7 @@ export type Database = {
           status?: string | null
           target_count?: number | null
           title: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -189,7 +189,7 @@ export type Database = {
           status?: string | null
           target_count?: number | null
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -283,7 +283,7 @@ export type Database = {
           title: string
           type: string | null
           url: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           content_id?: string | null
@@ -297,7 +297,7 @@ export type Database = {
           title: string
           type?: string | null
           url?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           content_id?: string | null
@@ -311,7 +311,7 @@ export type Database = {
           title?: string
           type?: string | null
           url?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -379,7 +379,7 @@ export type Database = {
           status: string | null
           title: string
           type: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -402,7 +402,7 @@ export type Database = {
           status: string | null
           target_count: number | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -449,7 +449,7 @@ export type Database = {
           title: string
           type: string | null
           url: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -572,7 +572,7 @@ export type Database = {
           status: string | null
           title: string
           type: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -604,7 +604,7 @@ export type Database = {
           status: string | null
           target_count: number | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -660,7 +660,7 @@ export type Database = {
           title: string
           type: string | null
           url: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -818,7 +818,7 @@ export type Database = {
           status: string | null
           title: string
           type: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -851,7 +851,7 @@ export type Database = {
           status: string | null
           target_count: number | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -913,7 +913,7 @@ export type Database = {
           title: string
           type: string | null
           url: string | null
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
