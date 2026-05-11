@@ -33,7 +33,7 @@ import {
 } from "@/components/status-badge";
 import { useContents, useProjects, useCreateContent } from "@/hooks/use-database";
 
-export const Route = createFileRoute("/conteudos")({
+export const Route = createFileRoute("/contents")({
   head: () => ({ meta: [{ title: "Conteúdos — Central de Conteúdo" }] }),
   component: ContentsPage,
 });

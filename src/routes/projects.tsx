@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useProjects, useCreateProject } from "@/hooks/use-database";
 
-export const Route = createFileRoute("/projetos")({
+export const Route = createFileRoute("/projects")({
   head: () => ({ meta: [{ title: "Projetos — Central de Conteúdo" }] }),
   component: ProjectsPage,
 });
