@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGoals, useProjects, useContents, useCreateGoal } from "@/hooks/use-database";
 
-export const Route = createFileRoute("/metas")({
+export const Route = createFileRoute("/goals")({
   head: () => ({ meta: [{ title: "Metas — Central de Conteúdo" }] }),
   component: GoalsPage,
 });

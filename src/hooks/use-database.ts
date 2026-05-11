@@ -110,8 +110,8 @@ export function useProjects() {
       
       return (data || []).map((p: any) => ({
         id: p.id,
-        title: p.title || p.titulo,
-        description: p.description || p.descricao,
+        title: p.title,
+        description: p.description,
         objective: p.objective,
         niche: p.niche,
         main_platform: p.main_platform,

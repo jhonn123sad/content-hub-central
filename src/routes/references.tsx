@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useReferences, useProjects, useCreateReference } from "@/hooks/use-database";
 
-export const Route = createFileRoute("/referencias")({
+export const Route = createFileRoute("/references")({
   head: () => ({ meta: [{ title: "Referências — Central de Conteúdo" }] }),
   component: ReferencesPage,
 });

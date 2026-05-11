@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
@@ -20,8 +22,8 @@ export type Database = {
           format: string | null
           id: string
           image_url: string | null
-          media_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
@@ -41,8 +43,8 @@ export type Database = {
           format?: string | null
           id?: string
           image_url?: string | null
-          media_url?: string | null
           notes?: string | null
+          old_url_midia?: string | null
           planned_date?: string | null
           platform?: string | null
           priority?: string | null
@@ -62,8 +64,8 @@ export type Database = {
           format?: string | null
           id?: string
           image_url?: string | null
-          media_url?: string | null
           notes?: string | null
+          old_url_midia?: string | null
           planned_date?: string | null
           platform?: string | null
           priority?: string | null
@@ -78,7 +80,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "contents_project_id_fkey"
+            foreignKeyName: "conteudos_projeto_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -131,14 +133,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "creatives_content_id_fkey"
+            foreignKeyName: "criativos_conteudo_id_fkey"
             columns: ["content_id"]
             isOneToOne: false
             referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "creatives_project_id_fkey"
+            foreignKeyName: "criativos_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -191,13 +193,34 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "goals_project_id_fkey"
+            foreignKeyName: "metas_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       projects: {
         Row: {
@@ -292,189 +315,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "references_content_id_fkey"
+            foreignKeyName: "referencias_content_id_fkey"
             columns: ["content_id"]
             isOneToOne: false
             referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "references_project_id_fkey"
+            foreignKeyName: "referencias_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      content_files: {
-        Row: {
-          content_id: string | null
-          created_at: string
-          file_type: string | null
-          file_url: string
-          id: string
-        }
-        Insert: {
-          content_id?: string | null
-          created_at?: string
-          file_type?: string | null
-          file_url: string
-          id?: string
-        }
-        Update: {
-          content_id?: string | null
-          created_at?: string
-          file_type?: string | null
-          file_url?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_files_content_id_fkey"
-            columns: ["content_id"]
-            isOneToOne: false
-            referencedRelation: "contents"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tags: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      content_tags: {
-        Row: {
-          content_id: string
-          tag_id: string
-        }
-        Insert: {
-          content_id: string
-          tag_id: string
-        }
-        Update: {
-          content_id?: string
-          tag_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_tags_content_id_fkey"
-            columns: ["content_id"]
-            isOneToOne: false
-            referencedRelation: "contents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "content_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      reference_tags: {
-        Row: {
-          reference_id: string
-          tag_id: string
-        }
-        Insert: {
-          reference_id: string
-          tag_id: string
-        }
-        Update: {
-          reference_id?: string
-          tag_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reference_tags_reference_id_fkey"
-            columns: ["reference_id"]
-            isOneToOne: false
-            referencedRelation: "references"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reference_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      creative_tags: {
-        Row: {
-          creative_id: string
-          tag_id: string
-        }
-        Insert: {
-          creative_id: string
-          tag_id: string
-        }
-        Update: {
-          creative_id?: string
-          tag_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "creative_tags_creative_id_fkey"
-            columns: ["creative_id"]
-            isOneToOne: false
-            referencedRelation: "creatives"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creative_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      daily_progress: {
-        Row: {
-          created_at: string
-          date: string
-          goal_id: string | null
-          id: string
-          value: number
-        }
-        Insert: {
-          created_at?: string
-          date: string
-          goal_id?: string | null
-          id?: string
-          value: number
-        }
-        Update: {
-          created_at?: string
-          date?: string
-          goal_id?: string | null
-          id?: string
-          value?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "daily_progress_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "goals"
             referencedColumns: ["id"]
           },
         ]
@@ -486,23 +337,126 @@ export type Database = {
     Functions: {
       mvp_archive_content: {
         Args: { p_id: string }
-        Returns: Database["public"]["Tables"]["contents"]["Row"]
+        Returns: {
+          created_at: string
+          description: string | null
+          drive_url: string | null
+          format: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          old_url_midia: string | null
+          planned_date: string | null
+          platform: string | null
+          priority: string | null
+          project_id: string | null
+          published_date: string | null
+          published_url: string | null
+          script_or_copy: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_archive_creative: {
         Args: { p_id: string }
-        Returns: Database["public"]["Tables"]["creatives"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          file_url: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          status: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "creatives"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_archive_goal: {
         Args: { p_id: string }
-        Returns: Database["public"]["Tables"]["goals"]["Row"]
+        Returns: {
+          created_at: string
+          current_count: number | null
+          end_date: string | null
+          goal_type: string | null
+          id: string
+          period: string | null
+          project_id: string | null
+          start_date: string | null
+          status: string | null
+          target_count: number | null
+          title: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "goals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_archive_project: {
         Args: { p_id: string }
-        Returns: Database["public"]["Tables"]["projects"]["Row"]
+        Returns: {
+          created_at: string
+          daily_content_goal: number | null
+          description: string | null
+          drive_url: string | null
+          id: string
+          main_platform: string | null
+          niche: string | null
+          objective: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_archive_reference: {
         Args: { p_id: string }
-        Returns: Database["public"]["Tables"]["references"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          tags: string[] | null
+          title: string
+          type: string | null
+          url: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "references"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_content: {
         Args: {
@@ -521,7 +475,33 @@ export type Database = {
           p_status: string
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["contents"]["Row"]
+        Returns: {
+          created_at: string
+          description: string | null
+          drive_url: string | null
+          format: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          old_url_midia: string | null
+          planned_date: string | null
+          platform: string | null
+          priority: string | null
+          project_id: string | null
+          published_date: string | null
+          published_url: string | null
+          script_or_copy: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_content_v2: {
         Args: {
@@ -540,7 +520,33 @@ export type Database = {
           p_status: string
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["contents"]["Row"]
+        Returns: {
+          created_at: string
+          description: string | null
+          drive_url: string | null
+          format: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          old_url_midia: string | null
+          planned_date: string | null
+          platform: string | null
+          priority: string | null
+          project_id: string | null
+          published_date: string | null
+          published_url: string | null
+          script_or_copy: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_creative: {
         Args: {
@@ -554,7 +560,26 @@ export type Database = {
           p_title: string
           p_type: string
         }
-        Returns: Database["public"]["Tables"]["creatives"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          file_url: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          status: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "creatives"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_goal: {
         Args: {
@@ -567,11 +592,50 @@ export type Database = {
           p_target_count: number
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["goals"]["Row"]
+        Returns: {
+          created_at: string
+          current_count: number | null
+          end_date: string | null
+          goal_type: string | null
+          id: string
+          period: string | null
+          project_id: string | null
+          start_date: string | null
+          status: string | null
+          target_count: number | null
+          title: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "goals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_project: {
         Args: { p_description: string; p_status: string; p_title: string }
-        Returns: Database["public"]["Tables"]["projects"]["Row"]
+        Returns: {
+          created_at: string
+          daily_content_goal: number | null
+          description: string | null
+          drive_url: string | null
+          id: string
+          main_platform: string | null
+          niche: string | null
+          objective: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_create_reference: {
         Args: {
@@ -584,7 +648,26 @@ export type Database = {
           p_type: string
           p_url: string
         }
-        Returns: Database["public"]["Tables"]["references"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          tags: string[] | null
+          title: string
+          type: string | null
+          url: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "references"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_dashboard_summary: { Args: never; Returns: Json }
       mvp_list_contents: {
@@ -682,7 +765,33 @@ export type Database = {
           p_status: string
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["contents"]["Row"]
+        Returns: {
+          created_at: string
+          description: string | null
+          drive_url: string | null
+          format: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          old_url_midia: string | null
+          planned_date: string | null
+          platform: string | null
+          priority: string | null
+          project_id: string | null
+          published_date: string | null
+          published_url: string | null
+          script_or_copy: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_update_creative: {
         Args: {
@@ -697,7 +806,26 @@ export type Database = {
           p_title: string
           p_type: string
         }
-        Returns: Database["public"]["Tables"]["creatives"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          file_url: string
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          status: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "creatives"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_update_goal: {
         Args: {
@@ -711,7 +839,26 @@ export type Database = {
           p_target_count: number
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["goals"]["Row"]
+        Returns: {
+          created_at: string
+          current_count: number | null
+          end_date: string | null
+          goal_type: string | null
+          id: string
+          period: string | null
+          project_id: string | null
+          start_date: string | null
+          status: string | null
+          target_count: number | null
+          title: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "goals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_update_project: {
         Args: {
@@ -720,7 +867,27 @@ export type Database = {
           p_status: string
           p_title: string
         }
-        Returns: Database["public"]["Tables"]["projects"]["Row"]
+        Returns: {
+          created_at: string
+          daily_content_goal: number | null
+          description: string | null
+          drive_url: string | null
+          id: string
+          main_platform: string | null
+          niche: string | null
+          objective: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       mvp_update_reference: {
         Args: {
@@ -734,7 +901,26 @@ export type Database = {
           p_type: string
           p_url: string
         }
-        Returns: Database["public"]["Tables"]["references"]["Row"]
+        Returns: {
+          content_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          notes: string | null
+          project_id: string | null
+          tags: string[] | null
+          title: string
+          type: string | null
+          url: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "references"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {

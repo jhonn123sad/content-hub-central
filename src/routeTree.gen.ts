@@ -9,37 +9,37 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ReferenciasRouteImport } from './routes/referencias'
-import { Route as ProjetosRouteImport } from './routes/projetos'
-import { Route as MetasRouteImport } from './routes/metas'
-import { Route as CriativosRouteImport } from './routes/criativos'
-import { Route as ConteudosRouteImport } from './routes/conteudos'
+import { Route as ReferencesRouteImport } from './routes/references'
+import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as GoalsRouteImport } from './routes/goals'
+import { Route as CreativesRouteImport } from './routes/creatives'
+import { Route as ContentsRouteImport } from './routes/contents'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 
-const ReferenciasRoute = ReferenciasRouteImport.update({
-  id: '/referencias',
-  path: '/referencias',
+const ReferencesRoute = ReferencesRouteImport.update({
+  id: '/references',
+  path: '/references',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjetosRoute = ProjetosRouteImport.update({
-  id: '/projetos',
-  path: '/projetos',
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MetasRoute = MetasRouteImport.update({
-  id: '/metas',
-  path: '/metas',
+const GoalsRoute = GoalsRouteImport.update({
+  id: '/goals',
+  path: '/goals',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CriativosRoute = CriativosRouteImport.update({
-  id: '/criativos',
-  path: '/criativos',
+const CreativesRoute = CreativesRouteImport.update({
+  id: '/creatives',
+  path: '/creatives',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConteudosRoute = ConteudosRouteImport.update({
-  id: '/conteudos',
-  path: '/conteudos',
+const ContentsRoute = ContentsRouteImport.update({
+  id: '/contents',
+  path: '/contents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -56,106 +56,106 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/conteudos': typeof ConteudosRoute
-  '/criativos': typeof CriativosRoute
-  '/metas': typeof MetasRoute
-  '/projetos': typeof ProjetosRoute
-  '/referencias': typeof ReferenciasRoute
+  '/contents': typeof ContentsRoute
+  '/creatives': typeof CreativesRoute
+  '/goals': typeof GoalsRoute
+  '/projects': typeof ProjectsRoute
+  '/references': typeof ReferencesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/conteudos': typeof ConteudosRoute
-  '/criativos': typeof CriativosRoute
-  '/metas': typeof MetasRoute
-  '/projetos': typeof ProjetosRoute
-  '/referencias': typeof ReferenciasRoute
+  '/contents': typeof ContentsRoute
+  '/creatives': typeof CreativesRoute
+  '/goals': typeof GoalsRoute
+  '/projects': typeof ProjectsRoute
+  '/references': typeof ReferencesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/conteudos': typeof ConteudosRoute
-  '/criativos': typeof CriativosRoute
-  '/metas': typeof MetasRoute
-  '/projetos': typeof ProjetosRoute
-  '/referencias': typeof ReferenciasRoute
+  '/contents': typeof ContentsRoute
+  '/creatives': typeof CreativesRoute
+  '/goals': typeof GoalsRoute
+  '/projects': typeof ProjectsRoute
+  '/references': typeof ReferencesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/conteudos'
-    | '/criativos'
-    | '/metas'
-    | '/projetos'
-    | '/referencias'
+    | '/contents'
+    | '/creatives'
+    | '/goals'
+    | '/projects'
+    | '/references'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/conteudos'
-    | '/criativos'
-    | '/metas'
-    | '/projetos'
-    | '/referencias'
+    | '/contents'
+    | '/creatives'
+    | '/goals'
+    | '/projects'
+    | '/references'
   id:
     | '__root__'
     | '/'
     | '/auth'
-    | '/conteudos'
-    | '/criativos'
-    | '/metas'
-    | '/projetos'
-    | '/referencias'
+    | '/contents'
+    | '/creatives'
+    | '/goals'
+    | '/projects'
+    | '/references'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  ConteudosRoute: typeof ConteudosRoute
-  CriativosRoute: typeof CriativosRoute
-  MetasRoute: typeof MetasRoute
-  ProjetosRoute: typeof ProjetosRoute
-  ReferenciasRoute: typeof ReferenciasRoute
+  ContentsRoute: typeof ContentsRoute
+  CreativesRoute: typeof CreativesRoute
+  GoalsRoute: typeof GoalsRoute
+  ProjectsRoute: typeof ProjectsRoute
+  ReferencesRoute: typeof ReferencesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/referencias': {
-      id: '/referencias'
-      path: '/referencias'
-      fullPath: '/referencias'
-      preLoaderRoute: typeof ReferenciasRouteImport
+    '/references': {
+      id: '/references'
+      path: '/references'
+      fullPath: '/references'
+      preLoaderRoute: typeof ReferencesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/projetos': {
-      id: '/projetos'
-      path: '/projetos'
-      fullPath: '/projetos'
-      preLoaderRoute: typeof ProjetosRouteImport
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/metas': {
-      id: '/metas'
-      path: '/metas'
-      fullPath: '/metas'
-      preLoaderRoute: typeof MetasRouteImport
+    '/goals': {
+      id: '/goals'
+      path: '/goals'
+      fullPath: '/goals'
+      preLoaderRoute: typeof GoalsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/criativos': {
-      id: '/criativos'
-      path: '/criativos'
-      fullPath: '/criativos'
-      preLoaderRoute: typeof CriativosRouteImport
+    '/creatives': {
+      id: '/creatives'
+      path: '/creatives'
+      fullPath: '/creatives'
+      preLoaderRoute: typeof CreativesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/conteudos': {
-      id: '/conteudos'
-      path: '/conteudos'
-      fullPath: '/conteudos'
-      preLoaderRoute: typeof ConteudosRouteImport
+    '/contents': {
+      id: '/contents'
+      path: '/contents'
+      fullPath: '/contents'
+      preLoaderRoute: typeof ContentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -178,11 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  ConteudosRoute: ConteudosRoute,
-  CriativosRoute: CriativosRoute,
-  MetasRoute: MetasRoute,
-  ProjetosRoute: ProjetosRoute,
-  ReferenciasRoute: ReferenciasRoute,
+  ContentsRoute: ContentsRoute,
+  CreativesRoute: CreativesRoute,
+  GoalsRoute: GoalsRoute,
+  ProjectsRoute: ProjectsRoute,
+  ReferencesRoute: ReferencesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

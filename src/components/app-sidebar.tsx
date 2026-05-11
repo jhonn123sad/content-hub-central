@@ -24,11 +24,11 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Projetos", url: "/projetos", icon: FolderKanban },
-  { title: "Conteúdos", url: "/conteudos", icon: FileText },
-  { title: "Referências", url: "/referencias", icon: Bookmark },
-  { title: "Criativos", url: "/criativos", icon: ImageIcon },
-  { title: "Metas", url: "/metas", icon: Target },
+  { title: "Projetos", url: "/projects", icon: FolderKanban },
+  { title: "Conteúdos", url: "/contents", icon: FileText },
+  { title: "Referências", url: "/references", icon: Bookmark },
+  { title: "Criativos", url: "/creatives", icon: ImageIcon },
+  { title: "Metas", url: "/goals", icon: Target },
 ];
 
 export function AppSidebar() {
