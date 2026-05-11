@@ -95,8 +95,8 @@ export function useDashboardSummary() {
         ready_contents: 0, // Placeholder
         late_contents: 0, // Placeholder
         published_contents: 0, // Placeholder
-        recent_references: recentRefs.data || [],
-        upcoming_contents: upcomingContents.data || []
+        recent_references: (recentRefs.data || []) as any[],
+        upcoming_contents: (upcomingContents.data || []) as any[]
       };
     },
   });
@@ -118,7 +118,7 @@ export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (project: Partial<Project>) => {
-      const { data, error } = await supabase.from("projects").insert([project]).select().single();
+      const { data, error } = await supabase.from("projects").insert([project as any]).select().single();
       if (error) throw error;
       return data;
     },
@@ -145,7 +145,7 @@ export function useCreateContent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (content: Partial<Content>) => {
-      const { data, error } = await supabase.from("contents").insert([content]).select().single();
+      const { data, error } = await supabase.from("contents").insert([content as any]).select().single();
       if (error) throw error;
       return data;
     },
@@ -172,7 +172,7 @@ export function useCreateReference() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (reference: Partial<Reference>) => {
-      const { data, error } = await supabase.from("references").insert([reference]).select().single();
+      const { data, error } = await supabase.from("references").insert([reference as any]).select().single();
       if (error) throw error;
       return data;
     },
@@ -199,7 +199,7 @@ export function useCreateCreative() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (creative: Partial<Creative>) => {
-      const { data, error } = await supabase.from("creatives").insert([creative]).select().single();
+      const { data, error } = await supabase.from("creatives").insert([creative as any]).select().single();
       if (error) throw error;
       return data;
     },
@@ -226,7 +226,7 @@ export function useCreateGoal() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (goal: Partial<Goal>) => {
-      const { data, error } = await supabase.from("goals").insert([goal]).select().single();
+      const { data, error } = await supabase.from("goals").insert([goal as any]).select().single();
       if (error) throw error;
       return data;
     },
