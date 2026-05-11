@@ -14,181 +14,181 @@ export type Database = {
   }
   public: {
     Tables: {
-      conteudos: {
+      contents: {
         Row: {
           created_at: string
-          data_publicacao: string | null
           description: string | null
           drive_url: string | null
-          formato: string | null
+          format: string | null
           id: string
           image_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
-          projeto_id: string | null
+          project_id: string | null
+          published_date: string | null
           published_url: string | null
           script_or_copy: string | null
           status: string
-          titulo: string
+          title: string
           updated_at: string
-          url_midia: string | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
-          data_publicacao?: string | null
           description?: string | null
           drive_url?: string | null
-          formato?: string | null
+          format?: string | null
           id?: string
           image_url?: string | null
           notes?: string | null
+          old_url_midia?: string | null
           planned_date?: string | null
           platform?: string | null
           priority?: string | null
-          projeto_id?: string | null
+          project_id?: string | null
+          published_date?: string | null
           published_url?: string | null
           script_or_copy?: string | null
           status?: string
-          titulo: string
+          title: string
           updated_at?: string
-          url_midia?: string | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
-          data_publicacao?: string | null
           description?: string | null
           drive_url?: string | null
-          formato?: string | null
+          format?: string | null
           id?: string
           image_url?: string | null
           notes?: string | null
+          old_url_midia?: string | null
           planned_date?: string | null
           platform?: string | null
           priority?: string | null
-          projeto_id?: string | null
+          project_id?: string | null
+          published_date?: string | null
           published_url?: string | null
           script_or_copy?: string | null
           status?: string
-          titulo?: string
+          title?: string
           updated_at?: string
-          url_midia?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "conteudos_projeto_id_fkey"
-            columns: ["projeto_id"]
+            columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "projetos"
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
       }
-      criativos: {
+      creatives: {
         Row: {
-          conteudo_id: string | null
+          content_id: string | null
           created_at: string
           description: string | null
+          file_url: string
           id: string
           image_url: string | null
-          nome: string
           notes: string | null
           project_id: string | null
           status: string | null
-          tipo_arquivo: string | null
-          url_arquivo: string
+          title: string
+          type: string | null
           user_id: string
         }
         Insert: {
-          conteudo_id?: string | null
+          content_id?: string | null
           created_at?: string
           description?: string | null
+          file_url: string
           id?: string
           image_url?: string | null
-          nome: string
           notes?: string | null
           project_id?: string | null
           status?: string | null
-          tipo_arquivo?: string | null
-          url_arquivo: string
+          title: string
+          type?: string | null
           user_id: string
         }
         Update: {
-          conteudo_id?: string | null
+          content_id?: string | null
           created_at?: string
           description?: string | null
+          file_url?: string
           id?: string
           image_url?: string | null
-          nome?: string
           notes?: string | null
           project_id?: string | null
           status?: string | null
-          tipo_arquivo?: string | null
-          url_arquivo?: string
+          title?: string
+          type?: string | null
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "criativos_conteudo_id_fkey"
-            columns: ["conteudo_id"]
+            columns: ["content_id"]
             isOneToOne: false
-            referencedRelation: "conteudos"
+            referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "criativos_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "projetos"
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
       }
-      metas: {
+      goals: {
         Row: {
           created_at: string
+          current_count: number | null
+          end_date: string | null
           goal_type: string | null
           id: string
-          objetivo_valor: number | null
           period: string | null
-          prazo: string | null
-          progresso_valor: number | null
           project_id: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          target_count: number | null
+          title: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          current_count?: number | null
+          end_date?: string | null
           goal_type?: string | null
           id?: string
-          objetivo_valor?: number | null
           period?: string | null
-          prazo?: string | null
-          progresso_valor?: number | null
           project_id?: string | null
           start_date?: string | null
           status?: string | null
-          titulo: string
+          target_count?: number | null
+          title: string
           user_id: string
         }
         Update: {
           created_at?: string
+          current_count?: number | null
+          end_date?: string | null
           goal_type?: string | null
           id?: string
-          objetivo_valor?: number | null
           period?: string | null
-          prazo?: string | null
-          progresso_valor?: number | null
           project_id?: string | null
           start_date?: string | null
           status?: string | null
-          titulo?: string
+          target_count?: number | null
+          title?: string
           user_id?: string
         }
         Relationships: [
@@ -196,7 +196,7 @@ export type Database = {
             foreignKeyName: "metas_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "projetos"
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -222,11 +222,11 @@ export type Database = {
         }
         Relationships: []
       }
-      projetos: {
+      projects: {
         Row: {
           created_at: string
           daily_content_goal: number | null
-          descricao: string | null
+          description: string | null
           drive_url: string | null
           id: string
           main_platform: string | null
@@ -234,14 +234,14 @@ export type Database = {
           objective: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          title: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
           created_at?: string
           daily_content_goal?: number | null
-          descricao?: string | null
+          description?: string | null
           drive_url?: string | null
           id?: string
           main_platform?: string | null
@@ -249,14 +249,14 @@ export type Database = {
           objective?: string | null
           start_date?: string | null
           status?: string | null
-          titulo: string
+          title: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string
           daily_content_goal?: number | null
-          descricao?: string | null
+          description?: string | null
           drive_url?: string | null
           id?: string
           main_platform?: string | null
@@ -264,13 +264,13 @@ export type Database = {
           objective?: string | null
           start_date?: string | null
           status?: string | null
-          titulo?: string
+          title?: string
           updated_at?: string
           user_id?: string | null
         }
         Relationships: []
       }
-      referencias: {
+      references: {
         Row: {
           content_id: string | null
           created_at: string
@@ -280,7 +280,7 @@ export type Database = {
           notes: string | null
           project_id: string | null
           tags: string[] | null
-          titulo: string
+          title: string
           type: string | null
           url: string | null
           user_id: string
@@ -294,7 +294,7 @@ export type Database = {
           notes?: string | null
           project_id?: string | null
           tags?: string[] | null
-          titulo: string
+          title: string
           type?: string | null
           url?: string | null
           user_id: string
@@ -308,7 +308,7 @@ export type Database = {
           notes?: string | null
           project_id?: string | null
           tags?: string[] | null
-          titulo?: string
+          title?: string
           type?: string | null
           url?: string | null
           user_id?: string
@@ -318,14 +318,14 @@ export type Database = {
             foreignKeyName: "referencias_content_id_fkey"
             columns: ["content_id"]
             isOneToOne: false
-            referencedRelation: "conteudos"
+            referencedRelation: "contents"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "referencias_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "projetos"
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -339,28 +339,28 @@ export type Database = {
         Args: { p_id: string }
         Returns: {
           created_at: string
-          data_publicacao: string | null
           description: string | null
           drive_url: string | null
-          formato: string | null
+          format: string | null
           id: string
           image_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
-          projeto_id: string | null
+          project_id: string | null
+          published_date: string | null
           published_url: string | null
           script_or_copy: string | null
           status: string
-          titulo: string
+          title: string
           updated_at: string
-          url_midia: string | null
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "conteudos"
+          to: "contents"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -368,22 +368,22 @@ export type Database = {
       mvp_archive_creative: {
         Args: { p_id: string }
         Returns: {
-          conteudo_id: string | null
+          content_id: string | null
           created_at: string
           description: string | null
+          file_url: string
           id: string
           image_url: string | null
-          nome: string
           notes: string | null
           project_id: string | null
           status: string | null
-          tipo_arquivo: string | null
-          url_arquivo: string
+          title: string
+          type: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "criativos"
+          to: "creatives"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -392,21 +392,21 @@ export type Database = {
         Args: { p_id: string }
         Returns: {
           created_at: string
+          current_count: number | null
+          end_date: string | null
           goal_type: string | null
           id: string
-          objetivo_valor: number | null
           period: string | null
-          prazo: string | null
-          progresso_valor: number | null
           project_id: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          target_count: number | null
+          title: string
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "metas"
+          to: "goals"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -416,7 +416,7 @@ export type Database = {
         Returns: {
           created_at: string
           daily_content_goal: number | null
-          descricao: string | null
+          description: string | null
           drive_url: string | null
           id: string
           main_platform: string | null
@@ -424,13 +424,13 @@ export type Database = {
           objective: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          title: string
           updated_at: string
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "projetos"
+          to: "projects"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -446,14 +446,14 @@ export type Database = {
           notes: string | null
           project_id: string | null
           tags: string[] | null
-          titulo: string
+          title: string
           type: string | null
           url: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "referencias"
+          to: "references"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -477,28 +477,28 @@ export type Database = {
         }
         Returns: {
           created_at: string
-          data_publicacao: string | null
           description: string | null
           drive_url: string | null
-          formato: string | null
+          format: string | null
           id: string
           image_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
-          projeto_id: string | null
+          project_id: string | null
+          published_date: string | null
           published_url: string | null
           script_or_copy: string | null
           status: string
-          titulo: string
+          title: string
           updated_at: string
-          url_midia: string | null
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "conteudos"
+          to: "contents"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -522,28 +522,28 @@ export type Database = {
         }
         Returns: {
           created_at: string
-          data_publicacao: string | null
           description: string | null
           drive_url: string | null
-          formato: string | null
+          format: string | null
           id: string
           image_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
-          projeto_id: string | null
+          project_id: string | null
+          published_date: string | null
           published_url: string | null
           script_or_copy: string | null
           status: string
-          titulo: string
+          title: string
           updated_at: string
-          url_midia: string | null
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "conteudos"
+          to: "contents"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -561,22 +561,22 @@ export type Database = {
           p_type: string
         }
         Returns: {
-          conteudo_id: string | null
+          content_id: string | null
           created_at: string
           description: string | null
+          file_url: string
           id: string
           image_url: string | null
-          nome: string
           notes: string | null
           project_id: string | null
           status: string | null
-          tipo_arquivo: string | null
-          url_arquivo: string
+          title: string
+          type: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "criativos"
+          to: "creatives"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -594,21 +594,21 @@ export type Database = {
         }
         Returns: {
           created_at: string
+          current_count: number | null
+          end_date: string | null
           goal_type: string | null
           id: string
-          objetivo_valor: number | null
           period: string | null
-          prazo: string | null
-          progresso_valor: number | null
           project_id: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          target_count: number | null
+          title: string
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "metas"
+          to: "goals"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -618,7 +618,7 @@ export type Database = {
         Returns: {
           created_at: string
           daily_content_goal: number | null
-          descricao: string | null
+          description: string | null
           drive_url: string | null
           id: string
           main_platform: string | null
@@ -626,13 +626,13 @@ export type Database = {
           objective: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          title: string
           updated_at: string
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "projetos"
+          to: "projects"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -657,14 +657,14 @@ export type Database = {
           notes: string | null
           project_id: string | null
           tags: string[] | null
-          titulo: string
+          title: string
           type: string | null
           url: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "referencias"
+          to: "references"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -767,28 +767,28 @@ export type Database = {
         }
         Returns: {
           created_at: string
-          data_publicacao: string | null
           description: string | null
           drive_url: string | null
-          formato: string | null
+          format: string | null
           id: string
           image_url: string | null
           notes: string | null
+          old_url_midia: string | null
           planned_date: string | null
           platform: string | null
           priority: string | null
-          projeto_id: string | null
+          project_id: string | null
+          published_date: string | null
           published_url: string | null
           script_or_copy: string | null
           status: string
-          titulo: string
+          title: string
           updated_at: string
-          url_midia: string | null
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "conteudos"
+          to: "contents"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -807,22 +807,22 @@ export type Database = {
           p_type: string
         }
         Returns: {
-          conteudo_id: string | null
+          content_id: string | null
           created_at: string
           description: string | null
+          file_url: string
           id: string
           image_url: string | null
-          nome: string
           notes: string | null
           project_id: string | null
           status: string | null
-          tipo_arquivo: string | null
-          url_arquivo: string
+          title: string
+          type: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "criativos"
+          to: "creatives"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -841,21 +841,21 @@ export type Database = {
         }
         Returns: {
           created_at: string
+          current_count: number | null
+          end_date: string | null
           goal_type: string | null
           id: string
-          objetivo_valor: number | null
           period: string | null
-          prazo: string | null
-          progresso_valor: number | null
           project_id: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          target_count: number | null
+          title: string
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "metas"
+          to: "goals"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -870,7 +870,7 @@ export type Database = {
         Returns: {
           created_at: string
           daily_content_goal: number | null
-          descricao: string | null
+          description: string | null
           drive_url: string | null
           id: string
           main_platform: string | null
@@ -878,13 +878,13 @@ export type Database = {
           objective: string | null
           start_date: string | null
           status: string | null
-          titulo: string
+          title: string
           updated_at: string
           user_id: string | null
         }
         SetofOptions: {
           from: "*"
-          to: "projetos"
+          to: "projects"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -910,14 +910,14 @@ export type Database = {
           notes: string | null
           project_id: string | null
           tags: string[] | null
-          titulo: string
+          title: string
           type: string | null
           url: string | null
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "referencias"
+          to: "references"
           isOneToOne: true
           isSetofReturn: false
         }
