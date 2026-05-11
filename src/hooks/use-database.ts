@@ -30,6 +30,7 @@ export type Content = {
   published_url?: string | null;
   image_url?: string | null;
   notes?: string | null;
+  sort_order?: number;
   created_at?: string;
 };
 
@@ -129,12 +130,40 @@ export function useCreateProject() {
   });
 }
 
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Project> & { id: string }) => {
+      const { data, error } = await supabase.from("projects").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("projects").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
 // Contents Hooks
 export function useContents() {
   return useQuery({
     queryKey: ["contents"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("contents").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("contents").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: false });
       if (error) throw error;
       return data as Content[];
     },
@@ -148,6 +177,34 @@ export function useCreateContent() {
       const { data, error } = await supabase.from("contents").insert([content as any]).select().single();
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contents"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
+export function useUpdateContent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Content> & { id: string }) => {
+      const { data, error } = await supabase.from("contents").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contents"] });
+    },
+  });
+}
+
+export function useDeleteContent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("contents").delete().eq("id", id);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contents"] });
@@ -183,6 +240,34 @@ export function useCreateReference() {
   });
 }
 
+export function useUpdateReference() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Reference> & { id: string }) => {
+      const { data, error } = await supabase.from("references").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["references"] });
+    },
+  });
+}
+
+export function useDeleteReference() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("references").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["references"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
 // Creatives Hooks
 export function useCreatives() {
   return useQuery({
@@ -210,6 +295,34 @@ export function useCreateCreative() {
   });
 }
 
+export function useUpdateCreative() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Creative> & { id: string }) => {
+      const { data, error } = await supabase.from("creatives").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creatives"] });
+    },
+  });
+}
+
+export function useDeleteCreative() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("creatives").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creatives"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
 // Goals Hooks
 export function useGoals() {
   return useQuery({
@@ -229,6 +342,34 @@ export function useCreateGoal() {
       const { data, error } = await supabase.from("goals").insert([goal as any]).select().single();
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
+    },
+  });
+}
+
+export function useUpdateGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Goal> & { id: string }) => {
+      const { data, error } = await supabase.from("goals").update(updates as any).eq("id", id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
+    },
+  });
+}
+
+export function useDeleteGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("goals").delete().eq("id", id);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["goals"] });

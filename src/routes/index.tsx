@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   CalendarDays,
   CheckCircle2,
@@ -6,6 +6,9 @@ import {
   FolderKanban,
   Target,
   Bookmark,
+  Plus,
+  ArrowUpRight,
+  TrendingUp,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
@@ -13,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge, type ContentStatus } from "@/components/status-badge";
 import { useDashboardSummary } from "@/hooks/use-database";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,10 +63,22 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className="bg-muted/30 min-h-screen">
       <PageHeader
         title="Dashboard"
         description="Sua visão geral do dia"
+        action={
+          <div className="flex gap-2">
+             <Button variant="outline" size="sm" asChild>
+              <Link to="/contents">Ver tudo</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link to="/contents">
+                <Plus className="mr-2 h-4 w-4" /> Novo Conteúdo
+              </Link>
+            </Button>
+          </div>
+        }
       />
       <div className="space-y-6 p-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -70,23 +86,27 @@ function Dashboard() {
             icon={<CalendarDays className="h-4 w-4" />}
             label="Planejados hoje"
             value={today_planned_contents}
+            trend="+2 novos"
           />
           <StatCard
             icon={<CheckCircle2 className="h-4 w-4" />}
-            label="Prontos para publicar"
+            label="Prontos"
             value={ready_contents}
             tone="success"
+            trend="Ideal"
           />
           <StatCard
             icon={<Clock className="h-4 w-4" />}
             label="Em atraso"
             value={late_contents}
-            tone="destructive"
+            tone={late_contents > 0 ? "destructive" : undefined}
+            trend={late_contents > 0 ? "Atenção" : "Em dia"}
           />
           <StatCard
             icon={<FolderKanban className="h-4 w-4" />}
             label="Projetos ativos"
             value={active_projects}
+            trend="Operacional"
           />
         </div>
 
@@ -173,29 +193,41 @@ function StatCard({
   label,
   value,
   tone,
+  trend,
 }: {
   icon: React.ReactNode;
   label: string;
   value: number;
   tone?: "success" | "destructive";
+  trend?: string;
 }) {
   const toneClass =
     tone === "success"
-      ? "text-success"
+      ? "text-success bg-success/10"
       : tone === "destructive"
-        ? "text-destructive"
-        : "text-foreground";
+        ? "text-destructive bg-destructive/10"
+        : "text-primary bg-primary/10";
+  
+  const textClass = tone === "success" ? "text-success" : tone === "destructive" ? "text-destructive" : "text-foreground";
+
   return (
-    <Card>
-      <CardContent className="flex items-center justify-between p-5">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">
-            {label}
-          </p>
-          <p className={`mt-2 text-3xl font-semibold ${toneClass}`}>{value}</p>
+    <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${toneClass}`}>
+            {icon}
+          </div>
+          {trend && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              {trend}
+            </span>
+          )}
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-          {icon}
+        <div className="mt-4">
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <h3 className={`text-3xl font-bold tracking-tight ${textClass}`}>{value}</h3>
+          </div>
         </div>
       </CardContent>
     </Card>
