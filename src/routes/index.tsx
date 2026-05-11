@@ -105,9 +105,9 @@ function Dashboard() {
                   {(upcoming_contents || []).map((c) => (
                     <li key={c.id} className="flex items-center justify-between py-3">
                       <div>
-                        <p className="text-sm font-medium">{c.title || c.titulo}</p>
+                        <p className="text-sm font-medium">{c.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          {c.planned_date || c.data_planejada} · {c.platform || c.plataforma}
+                          {c.planned_date} · {c.platform}
                         </p>
                       </div>
                       <StatusBadge status={(c.status) as ContentStatus} />
