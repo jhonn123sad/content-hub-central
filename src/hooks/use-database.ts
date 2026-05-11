@@ -6,7 +6,12 @@ export type Project = {
   title: string;
   description: string | null;
   status: string;
-  created_at: string;
+  objective?: string | null;
+  niche?: string | null;
+  main_platform?: string | null;
+  daily_content_goal?: number | null;
+  start_date?: string | null;
+  created_at?: string;
 };
 
 export type Content = {
@@ -17,29 +22,42 @@ export type Content = {
   status: string;
   format: string | null;
   platform: string | null;
+  priority?: string | null;
   planned_date: string | null;
   published_date: string | null;
-  created_at: string;
+  script_or_copy?: string | null;
+  drive_url?: string | null;
+  published_url?: string | null;
+  image_url?: string | null;
+  notes?: string | null;
+  created_at?: string;
 };
 
 export type Reference = {
   id: string;
   project_id: string | null;
+  content_id?: string | null;
   title: string;
   description: string | null;
   type: string | null;
   url: string | null;
-  created_at: string;
+  image_url?: string | null;
+  notes?: string | null;
+  created_at?: string;
 };
 
 export type Creative = {
   id: string;
   project_id: string | null;
+  content_id?: string | null;
   title: string;
   type: string | null;
   status: string | null;
-  file_url: string | null;
-  created_at: string;
+  file_url: string;
+  image_url?: string | null;
+  description?: string | null;
+  notes?: string | null;
+  created_at?: string;
 };
 
 export type Goal = {
@@ -49,8 +67,11 @@ export type Goal = {
   goal_type: string | null;
   target_count: number | null;
   current_count: number | null;
+  period?: string | null;
+  start_date?: string | null;
   end_date: string | null;
   status: string;
+  created_at?: string;
 };
 
 // Dashboard Hook
@@ -58,18 +79,24 @@ export function useDashboardSummary() {
   return useQuery({
     queryKey: ["dashboard-summary"],
     queryFn: async () => {
-      // Simplificado: buscando contagens diretas das tabelas
-      const [projects, contents, goals] = await Promise.all([
+      const [projectsCount, contentsCount, goalsCount, recentRefs, upcomingContents] = await Promise.all([
         supabase.from("projects").select("id", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("contents").select("id", { count: "exact", head: true }),
-        supabase.from("goals").select("id", { count: "exact", head: true }).eq("status", "active")
+        supabase.from("goals").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("references").select("*").order("created_at", { ascending: false }).limit(4),
+        supabase.from("contents").select("*").gte("planned_date", new Date().toISOString().split('T')[0]).order("planned_date", { ascending: true }).limit(5)
       ]);
 
       return {
-        active_projects: projects.count || 0,
-        total_contents: contents.count || 0,
-        active_goals: goals.count || 0,
+        active_projects: projectsCount.count || 0,
+        total_contents: contentsCount.count || 0,
+        active_goals: goalsCount.count || 0,
+        today_planned_contents: 0, // Placeholder
+        ready_contents: 0, // Placeholder
+        late_contents: 0, // Placeholder
         published_contents: 0, // Placeholder
+        recent_references: recentRefs.data || [],
+        upcoming_contents: upcomingContents.data || []
       };
     },
   });
@@ -97,6 +124,7 @@ export function useCreateProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
     },
   });
 }
@@ -123,6 +151,7 @@ export function useCreateContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contents"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
     },
   });
 }
@@ -149,6 +178,7 @@ export function useCreateReference() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["references"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
     },
   });
 }
@@ -175,6 +205,7 @@ export function useCreateCreative() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creatives"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
     },
   });
 }
@@ -201,6 +232,7 @@ export function useCreateGoal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["goals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary"] });
     },
   });
 }
